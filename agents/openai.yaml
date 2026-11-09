@@ -1,0 +1,4 @@
+interface:
+  display_name: "Odoo User Guide DOCX"
+  short_description: "Soạn hướng dẫn Odoo tiếng Việt thành file Word"
+  default_prompt: "Dùng $odoo-userguide-docx-writer để tạo hoặc cập nhật hướng dẫn Odoo bằng DOCX từ tài liệu nguồn và các yêu cầu đã chốt."

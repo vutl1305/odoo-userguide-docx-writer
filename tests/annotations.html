@@ -1,0 +1,21 @@
+<!doctype html><meta charset="utf-8">
+<button id="left" style="position:absolute;left:10px;top:50px;width:100px">Lưu</button>
+<button id="right" style="position:absolute;right:10px;top:200px;width:100px">Xác nhận</button>
+<pre id="result"></pre>
+<script src="../scripts/screenshot_annotations.js"></script>
+<script>
+try {
+  for (const id of ['left', 'right']) {
+    const target = document.getElementById(id), before = target.getBoundingClientRect();
+    const shot = OdooUserGuide.annotate(target, {step: id});
+    const marker = document.querySelector('#odoo-userguide-annotation marker');
+    if (marker.getAttribute('markerUnits') !== 'userSpaceOnUse' || marker.getAttribute('markerWidth') !== '10') throw Error('Oversized arrowhead');
+    if (shot.clip.width < Math.min(400, innerWidth)) throw Error('Missing context near viewport edge');
+    if (shot.clip.x < 0 || shot.clip.x + shot.clip.width > innerWidth || shot.clip.y < 0 || shot.clip.y + shot.clip.height > innerHeight) throw Error('Crop exceeds viewport');
+    if (target.getBoundingClientRect().x !== before.x || document.getElementById('odoo-userguide-annotation').style.pointerEvents !== 'none') throw Error('Changed interactive UI');
+    OdooUserGuide.clear();
+    if (document.getElementById('odoo-userguide-annotation')) throw Error('Overlay remains');
+  }
+  document.getElementById('result').textContent = 'PASS';
+} catch (error) { document.getElementById('result').textContent = 'FAIL: ' + error.message; }
+</script>
