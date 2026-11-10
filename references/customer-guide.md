@@ -44,7 +44,7 @@ Không giả định có nút “Sửa” hoặc “Lưu”: một số phiên b
 - Bước đánh số, một hành động rõ ràng trong mỗi bước; sau mỗi bước có ảnh tương ứng. Ảnh có thể chỉ thao tác hoặc kết quả của bước, chú thích phải nói đúng trạng thái đó.
 - Ngay tại phần tạo/sửa có bảng trường: **Tên trường | Ý nghĩa | Cách nhập/chọn | Bắt buộc/điều kiện | Mặc định/tự điền/chỉ đọc và quy tắc**. Chỉ xác nhận thuộc tính có bằng chứng. Giải thích mã, đơn vị, ngày và tiền tệ tại nơi dùng.
 - Quy tắc ảnh hưởng tới lưu/gửi/duyệt, khóa sửa và thay đổi trạng thái được nêu tại bước liên quan. Quy tắc dùng chung cho nhiều công việc được giải thích ở mục 4 và dẫn chiếu, không chép lặp toàn bộ bảng trường.
-- Kết quả nhìn thấy; liên kết tới đúng tình huống lỗi. Tình huống gồm biểu hiện → nguyên nhân đã biết → cách xử lý → kết quả/đầu mối hỗ trợ đã được cung cấp.
+- **Kết quả:** mô tả dấu hiệu hoàn thành rồi chèn ảnh ngay bên dưới, cho thấy trạng thái sau thao tác. Ảnh kết quả mặc định là ảnh sạch; chỉ đánh dấu chi tiết cần đối chiếu nếu khó nhận biết. Chọn góc nhìn đủ dữ liệu/trạng thái thay vì lặp nguyên ảnh chỉ nút bấm trước thao tác. Chưa xác minh được kết quả thì giữ vị trí ảnh nháp, không dùng ảnh trước thao tác để khẳng định thành công. Liên kết tới đúng tình huống lỗi. Tình huống gồm biểu hiện → nguyên nhân đã biết → cách xử lý → kết quả/đầu mối hỗ trợ đã được cung cấp.
 
 Không viết thao tác tự động thành việc Người dùng phải bấm. Không viết nút xác nhận nếu giao diện không hiện nó; với bước có điều kiện, mô tả ảnh kết quả và điều kiện bằng chữ.
 

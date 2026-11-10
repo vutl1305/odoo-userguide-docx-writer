@@ -71,6 +71,8 @@ Sửa **bản sao** trong `$UG_WORK/addons`, không sửa mã lõi Odoo:
 
 Ví dụ đã chạy trong mẫu: mở `/odoo` bằng `login='admin'`, chụp nút menu cá nhân → bấm mở menu và chụp “Tùy chọn của tôi” → bấm mở hộp thoại và chụp trường ngôn ngữ. Sửa URL/selector theo phiên bản, không coi ví dụ là đúng cho mọi phiên bản.
 
+Với mỗi đoạn “Kết quả”, khai báo thêm frame riêng có `phase='after'`, ID rõ ràng (ví dụ `result-create-record`), điều kiện chờ dấu hiệu hoàn thành và câu mô tả kết quả. Khi đưa vào Word, chọn trường **`raw`** cho ảnh sạch. Chỉ chọn **`annotated`** nếu cần chỉ một chi tiết cụ thể. Runner vẫn có thể lưu cả hai bản; việc sinh bản đánh dấu không có nghĩa phải chèn bản đó vào tài liệu.
+
 Khi hướng dẫn “chọn Lưu”, ảnh **before** phải thấy nút Lưu và dữ liệu hợp lệ trước khi bấm. Khi hướng dẫn “kiểm tra đã lưu”, thực hiện lưu thật trong `prepare`, chờ dấu hiệu lưu xong rồi chụp **after**. Không chụp cùng một trạng thái tổng quan rồi gán cho hàng loạt hành động khác nhau.
 
 `prepare` chạy thao tác thật: bấm menu, điền trường, chọn giá trị. Dùng `await el(selector)`/`await until(predicate, mô_tả)` chờ phần tử và kết quả; `paint()` chờ hai khung hình cho trình duyệt vẽ. Không chỉ ngủ một khoảng cố định rồi chụp khi dữ liệu còn tải.
@@ -151,9 +153,9 @@ print('Đủ 3 ảnh sạch, 3 ảnh đánh dấu và manifest.')
 PY
 ```
 
-Đổi số lượng/manifest khi thêm luồng. Khi sửa helper annotation, mở `tests/annotations.html` bằng Chrome headless/trình duyệt cục bộ và kiểm tra kết quả `PASS`, cùng các kiểm thử Python của skill. Xem từng ảnh và đối chiếu với bước: đúng màn hình, dữ liệu, trạng thái, nhãn, đích mũi tên; không spinner/lỗi/che chữ. Ảnh sạch cho phép chụp lại chú thích mà không tô xóa UI. Không xóa DB khi còn cần sửa ảnh.
+Đổi số lượng/manifest khi thêm luồng. Khi sửa helper annotation, mở `tests/annotations.html` bằng Chrome headless/trình duyệt cục bộ và kiểm tra kết quả `PASS`, cùng các kiểm thử Python của skill. Rà soát đủ ảnh cho cả bước thao tác lẫn đoạn “Kết quả”. Xem từng ảnh và đối chiếu với nội dung tương ứng: đúng màn hình, dữ liệu, trạng thái, nhãn, đích mũi tên; không spinner/lỗi/che chữ. Ảnh sạch cho phép chụp lại chú thích mà không tô xóa UI. Không xóa DB khi còn cần sửa ảnh.
 
-Sao chép ảnh và manifest vào thư mục tài liệu cần giữ lâu dài. Trong DOCX, lấy ảnh **`annotated` theo ID bước**, chèn ngay sau đúng bước, thêm chú thích và alt text, giữ tỷ lệ. Không chọn “ảnh PNG mới nhất” hoặc chỉ dựa vào số thứ tự ảnh trong ZIP Word. Thêm viền ngoài 1px bằng `scripts/style_docx_images.py`, rồi chạy `scripts/check_docx.py --require-step-images` như hướng dẫn Word.
+Sao chép ảnh và manifest vào thư mục tài liệu cần giữ lâu dài. Trong DOCX, lấy ảnh theo **ID bước hoặc ID kết quả**: chọn **`raw`** khi ảnh đã rõ hoặc đang minh họa kết quả; chỉ chọn **`annotated`** khi có vị trí khó nhận biết cần chỉ dẫn. Chèn ngay sau đúng bước hoặc đoạn “Kết quả”, thêm chú thích và alt text, giữ tỷ lệ. Không chọn “ảnh PNG mới nhất” hoặc chỉ dựa vào số thứ tự ảnh trong ZIP Word. Thêm viền ngoài 1px bằng `scripts/style_docx_images.py`, rồi chạy `scripts/check_docx.py --require-step-images` như hướng dẫn Word.
 
 ## 7. Dọn môi trường thử khi đã xong
 

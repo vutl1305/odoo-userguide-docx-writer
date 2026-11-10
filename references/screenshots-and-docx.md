@@ -11,9 +11,21 @@ Khi có mã nguồn Odoo, dùng bộ mẫu tự chứa của skill tại `assets
 - Không in bí mật cấu hình. Không dùng dữ liệu môi trường này để suy đoán quyền của vai trò khác. Không gửi email/chat ra ngoài chỉ để có ảnh.
 - Dọn đúng DB tạm do tác vụ tạo sau khi xong; kiểm tra tên chính xác, tránh DB nguồn, không dùng mẫu tên chung để xóa hàng loạt.
 
-## Mỗi bước có ảnh tương ứng
+## Ảnh của bước thao tác và phần Kết quả
 
-Lập manifest tối thiểu: mã bước, mục, câu hướng dẫn, ảnh, đích mũi tên, trạng thái trước/sau thao tác. Chụp đúng trạng thái trước khi bấm nút hoặc sau khi có kết quả, theo chú thích. Một ảnh tổng quan cho nhiều bước không đáp ứng mặc định “mỗi bước một ảnh”.
+Lập manifest tối thiểu: mã bước hoặc kết quả, mục, câu hướng dẫn/kết quả, ảnh, trạng thái trước/sau thao tác và lựa chọn ảnh sạch/ảnh đánh dấu; chỉ cần đích mũi tên khi chọn ảnh đánh dấu. Chụp đúng trạng thái trước khi bấm nút hoặc sau khi có kết quả, theo chú thích. Một ảnh tổng quan cho nhiều bước không đáp ứng mặc định “mỗi bước một ảnh”.
+
+### Chọn ảnh sạch hay ảnh đánh dấu
+
+| Mục đích ảnh | Cách trình bày |
+| --- | --- |
+| Chỉ nút nhỏ, biểu tượng, trường hoặc mục menu khó tìm | Có thể dùng mũi tên nhỏ/khung mảnh tại đúng đích. |
+| Tổng quan ứng dụng, danh sách, biểu mẫu đã lưu, bảng/biểu đồ báo cáo | Ưu tiên ảnh sạch; chỉ đánh dấu khi có chi tiết cụ thể cần chỉ ra. |
+| Phần “Kết quả” | Chụp sau thao tác, ưu tiên ảnh sạch thể hiện trạng thái/dữ liệu/đầu ra; đặt ngay sau đoạn kết quả. |
+
+Ví dụ: tạo hồ sơ → ảnh biểu mẫu đã lưu và tên hồ sơ; ghi chú → ảnh nội dung đã xuất hiện trong lịch sử; lập hoạt động → ảnh công việc đã được thêm; xuất Excel → ảnh nội dung file đã xuất thật. Ảnh chỉ vào nút Lưu/Gửi/Xuất trước khi bấm không thay thế ảnh kết quả.
+
+Ảnh sạch vẫn có **viền ngoài 1px khi chèn Word**. Viền này khác khoanh đỏ/mũi tên chỉ đích. Không đánh dấu chỉ để mọi ảnh trông giống nhau. Mẫu chụp có thể lưu cả hai bản để dùng lại, nhưng tài liệu không bắt buộc chọn bản có annotation.
 
 Đọc và chạy [quy trình chụp ảnh](capture-workflow.md): có cấu hình DB tạm, add-on mẫu, đăng nhập admin, điều hướng, `Page.captureScreenshot`, ghi PNG sạch/đánh dấu và manifest. Không chỉ gọi helper rồi xóa overlay: như vậy chưa tạo ra ảnh. Bộ mẫu nằm ngay trong skill, không cần tìm template ở skill khác.
 

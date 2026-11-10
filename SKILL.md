@@ -21,7 +21,8 @@ Soạn tài liệu để khách hàng không chuyên kỹ thuật thực hiện 
 - Có giới thiệu tài liệu, tổng quan hệ thống và **hướng dẫn thao tác chung mặc định của Odoo**, ngoài phần nghiệp vụ riêng. Không chép cấu trúc SRS thành cấu trúc tài liệu.
 - Mỗi mục tiêu nghiệp vụ có một hướng dẫn chính. **Mô tả trường và quy tắc ngay tại bước tạo/sửa**, không đẩy hết sang danh mục tra cứu riêng. Không thêm chương thực hành tình huống mẫu hoặc bảng tham chiếu lặp lại nếu không được yêu cầu.
 - Không thêm phụ lục giả định/cần xác nhận vào bản khách hàng. Giữ các điểm chưa rõ trong ghi nhận nội bộ; không biến chúng thành hành vi đã xác nhận. Tránh lời nhắc dài về tài khoản admin, dữ liệu mẫu, môi trường thử hoặc cách đọc tài liệu nếu Người dùng đã bỏ.
-- Mỗi **bước thao tác đã viết** có ảnh ngay sau, với mũi tên nhỏ chỉ đúng nút/trường hoặc điểm cần kiểm tra. Ảnh có **viền 1px**, chú thích và mô tả thay thế. Chưa có ảnh thật thì dùng `[ẢNH: màn hình, vị trí và thao tác cần minh họa]` trong bản nháp; không tuyên bố đủ ảnh.
+- Mỗi **bước thao tác đã viết** có ảnh ngay sau. Mỗi phần **“Kết quả”** có ảnh ngay sau nội dung kết quả, thể hiện trạng thái thực tế sau thao tác; ưu tiên ảnh sạch để đối chiếu dữ liệu, trạng thái hoặc đầu ra.
+- **Không bắt buộc khoanh đỏ hoặc mũi tên trên mọi ảnh.** Chỉ đánh dấu khi cần chỉ đúng nút/trường hoặc một chi tiết khó nhận biết. Màn hình tổng quan, nội dung đã lưu, bảng báo cáo và kết quả đầu ra rõ ràng dùng ảnh sạch. Khi cần đánh dấu, dùng mũi tên nhỏ/khung mảnh và không che chữ. Tất cả ảnh vẫn có **viền ngoài 1px**, chú thích và mô tả thay thế. Chưa có ảnh thật thì dùng `[ẢNH: màn hình, vị trí và thao tác hoặc kết quả cần minh họa]` trong bản nháp; không tuyên bố đủ ảnh.
 - Tên doanh nghiệp, người phụ trách, sản phẩm và hồ sơ tự nhiên như dữ liệu vận hành; không đặt tên “Khách hàng minh họa”, “Cơ hội hướng dẫn”, “MH…”. Chưa có dữ liệu thật được phép dùng thì tạo dữ liệu hư cấu hợp lý.
 
 ## Chụp và định dạng
@@ -36,6 +37,6 @@ Khi cần chụp, thực hiện theo [quy trình chụp chạy được](referen
 
 ## Trước khi bàn giao
 
-Đối chiếu phạm vi và bản gốc: không mất chỉnh sửa thủ công, không thêm lại phần đã xóa, không viết vượt phần được giao. Xem từng ảnh, kiểm tra mũi tên không che chữ và viền đủ mảnh. Kết xuất Word/PDF bằng công cụ sẵn có để kiểm tra bố cục và cập nhật mục lục; kiểm tra tự động không thay thế xem bản kết xuất. Ghi rõ kiểm tra nào chưa thực hiện trong ghi nhận nội bộ và nêu giới hạn ảnh hưởng trực tiếp tới bàn giao.
+Đối chiếu phạm vi và bản gốc: không mất chỉnh sửa thủ công, không thêm lại phần đã xóa, không viết vượt phần được giao. Rà soát riêng ảnh của từng bước và từng phần “Kết quả”. Xem từng ảnh, bỏ đánh dấu không cần thiết, kiểm tra mũi tên không che chữ và viền đủ mảnh. Kết xuất Word/PDF bằng công cụ sẵn có để kiểm tra bố cục và cập nhật mục lục; kiểm tra tự động không thay thế xem bản kết xuất. Ghi rõ kiểm tra nào chưa thực hiện trong ghi nhận nội bộ và nêu giới hạn ảnh hưởng trực tiếp tới bàn giao.
 
 Trả liên kết **DOCX**, tóm tắt ngắn thay đổi và phần chưa viết. Không gửi Markdown thay cho Word, không công bố/commit/push tài liệu hoặc skill nếu chưa được giao.
