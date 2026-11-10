@@ -1,15 +1,17 @@
-# Quy ước biên soạn và chỉnh sửa
+# Writing and revision conventions
 
-## Nguồn và bằng chứng
+The guide is Vietnamese. Quoted Vietnamese text below is the exact wording or heading to use.
 
-- Đọc SRS, luồng nghiệp vụ, ảnh hoặc mẫu in được giao. Nếu cùng có Markdown và DOCX thì đọc cả hai, xác định phiên bản; không giả định một file tồn tại vì được nhắc tới.
-- Tra tri thức dự án nếu có, đối chiếu mã nguồn và giao diện đang chạy khi cần. Lưu bằng chứng kỹ thuật ở ghi nhận nội bộ; tài liệu khách hàng không chứa tên model, phương thức, SQL hoặc đường dẫn mã nguồn.
-- SRS xác định phạm vi; giao diện/mã nguồn xác nhận cách thao tác thực tế. Khi chúng mâu thuẫn, ghi điểm lệch để xử lý; không âm thầm bịa nút hoặc chọn một quy tắc rồi mô tả như đã thống nhất.
-- Xác minh phiên bản, ngôn ngữ và mô-đun thực tế. Odoo có tùy biến không đồng nghĩa với Odoo chuẩn cùng tên ứng dụng.
+## Sources and evidence
 
-## Khung mặc định khi chưa có khung được duyệt
+- Read the assigned SRS, business flows, screenshots or print templates. If both Markdown and DOCX exist, read both and identify the versions; do not assume a file exists because it was mentioned.
+- Consult the project knowledge base if any; check source code and the running UI when needed. Keep technical evidence in internal notes; the customer guide contains no model names, methods, SQL or source paths.
+- The SRS sets scope; the UI/code confirms how it actually works. When they conflict, record the gap; never silently invent a button or pick one rule and present it as agreed.
+- Verify the actual version, language and modules. A customized Odoo is not the standard app of the same name.
 
-Dùng làm điểm xuất phát, điều chỉnh theo nghiệp vụ trong nguồn:
+## Default outline when none is approved
+
+Starting point; adapt to the business in the sources:
 
 1. Giới thiệu tài liệu và tổng quan hệ thống.
 2. Hướng dẫn sử dụng giao diện và thao tác chung trên Odoo.
@@ -19,54 +21,54 @@ Dùng làm điểm xuất phát, điều chỉnh theo nghiệp vụ trong nguồ
 6. Giải thích thuật ngữ.
 7. Lịch sử cập nhật tài liệu.
 
-Không tách từng nhóm nghiệp vụ thành một chương cấp cao chỉ vì SRS chia như vậy. Tổ chức chúng trong mục 3 theo công việc. Không tự thêm “Bắt đầu từ đâu”, “Bắt đầu nhanh”, “Hiểu cách hệ thống vận hành”, chương thực hành mẫu, danh mục tra cứu nghiệp vụ lặp lại hoặc chương giả định.
+Do not turn each SRS business group into a top-level chapter; organise them inside chapter 3 by task. Do not add “Bắt đầu từ đâu”, “Bắt đầu nhanh”, “Hiểu cách hệ thống vận hành”, a worked-example chapter, a repeated business reference list or an assumptions chapter.
 
-Phần giới thiệu tối thiểu nêu tài liệu hướng dẫn gì, dành cho ai, giới hạn nghiệp vụ, các ứng dụng liên quan và luồng xử lý tổng thể. Các mục phụ như điều kiện truy cập, cách tra cứu, quy ước ảnh chỉ thêm khi có ích và chưa bị Người dùng bỏ. Không khôi phục những mục này khi sửa tài liệu đã được rút gọn.
+The introduction states at least: what the guide covers, for whom, business limits, related apps and the overall flow. Optional sub-sections (access conditions, how to look things up, image conventions) only when useful and not removed by the user. Never restore them when revising a trimmed document.
 
-## Phạm vi thao tác chung của Odoo
+## Scope of Odoo common operations
 
-Đối chiếu từng chức năng có thực tế trước khi viết chi tiết:
+Confirm each function exists before writing it up:
 
-| Nhóm | Nội dung cần xem xét |
+| Group | Consider |
 | --- | --- |
-| Truy cập | Đăng nhập/đăng xuất; tùy chọn cá nhân, ngôn ngữ, múi giờ; ứng dụng và menu. |
-| Hiển thị và tra cứu | Danh sách, Kanban, biểu mẫu; tìm kiếm, lọc, nhóm; lưu/sử dụng lại điều kiện tìm kiếm. |
-| Nhập thông tin | Tạo, sửa, lưu, bỏ thay đổi; trường liên kết, ngày, số, dòng chi tiết, giá trị tự tính/chỉ đọc. |
-| Phối hợp | Ghi chú, gửi trao đổi, tệp đính kèm, lịch sử; lập lịch/hoàn thành hoạt động, thông báo, chứng từ liên quan. |
-| Báo cáo | Pivot, biểu đồ, chỉ số, điều kiện lọc, đơn vị tiền tệ, xuất dữ liệu khi có quyền/chức năng. |
+| Access | Login/logout; preferences, language, timezone; apps and menus. |
+| Viewing and finding | List, Kanban, form; search, filter, group; save/reuse searches. |
+| Data entry | Create, edit, save, discard; relational, date, number fields, detail lines, computed/read-only values. |
+| Collaboration | Notes, messages, attachments, history; schedule/complete activities, notifications, related documents. |
+| Reporting | Pivot, graph, measures, filters, currency, export when permitted/available. |
 
-Không giả định có nút “Sửa” hoặc “Lưu”: một số phiên bản cho sửa trực tiếp, tự lưu và có biểu tượng lưu thủ công. Dùng đúng nhãn đang thấy; nhãn tiếng Anh còn tồn tại được giữ và giải thích ngắn bằng tiếng Việt. Không khẳng định có bảng điều khiển, ghim báo cáo, tích hợp lịch hoặc nút duyệt chỉ vì Odoo có thể hỗ trợ.
+Do not assume “Sửa” or “Lưu” buttons exist: some versions edit inline, autosave and show a manual save icon. Use the labels actually shown; English labels that remain in the UI are kept and briefly explained in Vietnamese. Do not claim dashboards, pinning reports, calendar sync or approval buttons just because Odoo can support them.
 
-## Cấu trúc một hướng dẫn nghiệp vụ
+## Structure of one business guide
 
-- Mục tiêu, vai trò và điều kiện thực tế cần để hoàn thành công việc.
-- Cách mở màn hình, theo đúng menu đã kiểm tra.
-- Bước đánh số, một hành động rõ ràng trong mỗi bước; sau mỗi bước có ảnh tương ứng. Ảnh có thể chỉ thao tác hoặc kết quả của bước, chú thích phải nói đúng trạng thái đó.
-- Ngay tại phần tạo/sửa có bảng trường: **Tên trường | Ý nghĩa | Cách nhập/chọn | Bắt buộc/điều kiện | Mặc định/tự điền/chỉ đọc và quy tắc**. Chỉ xác nhận thuộc tính có bằng chứng. Giải thích mã, đơn vị, ngày và tiền tệ tại nơi dùng.
-- Quy tắc ảnh hưởng tới lưu/gửi/duyệt, khóa sửa và thay đổi trạng thái được nêu tại bước liên quan. Quy tắc dùng chung cho nhiều công việc được giải thích ở mục 4 và dẫn chiếu, không chép lặp toàn bộ bảng trường.
-- **Kết quả:** mô tả dấu hiệu hoàn thành rồi chèn ảnh ngay bên dưới, cho thấy trạng thái sau thao tác. Ảnh kết quả mặc định là ảnh sạch; chỉ đánh dấu chi tiết cần đối chiếu nếu khó nhận biết. Chọn góc nhìn đủ dữ liệu/trạng thái thay vì lặp nguyên ảnh chỉ nút bấm trước thao tác. Chưa xác minh được kết quả thì giữ vị trí ảnh nháp, không dùng ảnh trước thao tác để khẳng định thành công. Liên kết tới đúng tình huống lỗi. Tình huống gồm biểu hiện → nguyên nhân đã biết → cách xử lý → kết quả/đầu mối hỗ trợ đã được cung cấp.
+- Goal, role and real preconditions for the task.
+- How to open the screen, using the verified menu path.
+- Numbered steps, one clear action each, each followed by its image. The image may show the action or its result; the caption must state exactly that state.
+- At the create/edit part, a field table: **Tên trường | Ý nghĩa | Cách nhập/chọn | Bắt buộc/điều kiện | Mặc định/tự điền/chỉ đọc và quy tắc**. Confirm only properties with evidence. Explain codes, units, dates and currency where used.
+- Rules affecting save/send/approve, edit locks and status changes go at the relevant step. Rules shared by many tasks are explained in chapter 4 and referenced, not copied as full field tables.
+- **“Kết quả:”** describe the sign of completion, then insert an image right below showing the state after the action. Result images are clean by default; mark only a detail that is hard to spot. Choose a view with enough data/status instead of repeating the before-click image. If the result is not verified, keep a draft placeholder; never use a before-action image to claim success. Link to the matching troubleshooting case. A case is: symptom → known cause → fix → result/support contact provided.
 
-Dẫn chiếu sang mục khác:
+Cross-references to other sections:
 
-| Trường hợp | Cách viết |
+| Case | How to write |
 | --- | --- |
-| Thao tác nhiều bước đã có hướng dẫn riêng (mở danh sách cơ hội, ghi nhận hoàn thành hoạt động) | “… theo mục 2.3”, có liên kết bấm được. |
-| Nơi giải thích chi tiết một khái niệm/trạng thái | “… được giải thích tại mục 4.4”. |
-| Thao tác cơ bản (lưu, kiểm tra bộ lọc, nút đã thấy ở trên) | Viết thẳng hành động, không dẫn chiếu. |
-| Chú thích hình | Chỉ mô tả nội dung hình, không dẫn chiếu. |
-| Ghi chú tiến độ/cấu trúc tài liệu (“mục 3–6 là khung”) | Chỉ để trong bản nháp nội bộ; bỏ khi phát hành. |
+| Multi-step task with its own guide (open the opportunity list, mark an activity done) | “… theo mục 2.3”, as a clickable link. |
+| Where a concept/status is explained in detail | “… được giải thích tại mục 4.4”. |
+| Basic action (save, check filters, a button already shown above) | State the action directly, no reference. |
+| Figure caption | Describe the image only, no reference. |
+| Progress/structure notes (“mục 3–6 là khung”) | Internal drafts only; remove on release. |
 
-Không viết thao tác tự động thành việc Người dùng phải bấm. Không viết nút xác nhận nếu giao diện không hiện nó; với bước có điều kiện, mô tả ảnh kết quả và điều kiện bằng chữ.
+Never write an automatic action as something the user must click. Never write a confirmation button the UI does not show; for conditional steps, describe the result image and the condition in text.
 
-## Chỉnh sửa bản khách hàng
+## Revising the customer copy
 
-| Yêu cầu | Cách thực hiện |
+| Request | How |
 | --- | --- |
-| Chỉ tạo khung | DOCX có đầu mục và phạm vi dự kiến; chưa viết đầy đủ thao tác. |
-| Viết đến một mục | Hoàn thành đúng điểm dừng; giữ phần còn lại theo trạng thái đã được duyệt. |
-| Ghép khung để chia việc | Giữ nội dung đã viết, bổ sung đủ đầu mục con và phạm vi từ khung đã duyệt; chưa tự viết chi tiết. |
-| Người dùng vừa sửa DOCX | Chụp lại bản gốc và dấu vết phiên bản; sửa bản mới từ DOCX đó, không dùng bản Markdown cũ để tái tạo. |
-| Chỉ sửa ảnh/font | Giữ nội dung và hình học còn lại khi có thể; không tự tái cấu trúc, thêm lời dẫn hoặc giả định. |
-| Đã bỏ ghi chú/phụ lục | Giữ việc loại bỏ; lưu thiếu sót quan trọng trong ghi nhận nội bộ, không chèn lại lời nhắc mặc định. |
+| Outline only | DOCX with headings and planned scope; no full procedures yet. |
+| Write up to a section | Stop exactly there; leave the rest as approved. |
+| Merge outline to split work | Keep written content, add all sub-headings and scope from the approved outline; do not write details. |
+| User just edited the DOCX | Snapshot the original and its version marks; revise a new file from that DOCX, never regenerate from old Markdown. |
+| Images/fonts only | Keep content and remaining geometry where possible; no restructuring, new lead-ins or assumptions. |
+| Notes/appendix removed | Keep them removed; log important gaps internally, do not re-insert default reminders. |
 
-Phân biệt phiên bản tài liệu với phiên bản Odoo. Cập nhật lịch sử theo thay đổi thực tế. Không cố định tên khách hàng, mô-đun, đường dẫn hoặc số bước của một tài liệu cụ thể thành phạm vi mọi tài liệu.
+Distinguish document version from Odoo version. Update the history table with the actual changes. Do not hard-code one document's customer name, modules, paths or step counts as rules for every document.

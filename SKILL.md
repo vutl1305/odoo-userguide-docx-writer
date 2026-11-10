@@ -1,45 +1,45 @@
 ---
 name: odoo-userguide-docx-writer
-description: Use when creating or revising a Vietnamese customer-facing Odoo user guide in Word (.docx), including outline approval, task instructions from an SRS, annotated screenshots, or preserving a customer-edited DOCX.
+description: Use when creating or revising a Vietnamese customer-facing Odoo user guide in Word (.docx), including outline approval, task instructions from an SRS, real screenshots, clickable cross-references, or preserving a customer-edited DOCX.
 ---
 
 # Odoo user guide DOCX writer
 
-Soạn tài liệu để khách hàng không chuyên kỹ thuật thực hiện công việc trên Odoo. Đầu ra chính là **file Word có thể chỉnh sửa**, không yêu cầu khách hàng đọc Markdown. Các mặc định dưới đây ghi nhận phong cách khách hàng đã chọn; yêu cầu mới của Người dùng luôn ưu tiên.
+Write guides that let non-technical customers do their work in Odoo. The deliverable is an **editable Word file**; never hand the customer Markdown. The defaults below record the style this customer chose; a newer request from the user always wins. Instructions here are in English; **the document itself is Vietnamese**, and quoted phrases (“Người dùng”, “Kết quả:”) are the exact wording to use.
 
-## Chọn phạm vi trước khi viết
+## Decide scope before writing
 
-1. Xác định tài liệu nguồn, bản DOCX mới nhất, khung đã duyệt và phần được giao. Đọc các nguồn được cung cấp; báo nguồn thiếu trong ghi nhận nội bộ. Không mặc định phiên bản Odoo hay coi tùy biến là tính năng chuẩn.
-2. **Chưa duyệt khung:** tạo DOCX khung có đủ đầu mục và phạm vi dự kiến, dừng ở khung để Người dùng đánh giá. **Đã duyệt hoặc được giao viết tiếp:** thực hiện ngay phần đã giao, không hỏi lại việc đã chốt. Không tự viết toàn bộ các chương còn lại.
-3. **Sửa tài liệu:** lấy DOCX Người dùng vừa cập nhật làm bản gốc. Giữ nội dung, thứ tự và phần đã xóa; không dựng lại từ Markdown hoặc script cũ. Tạo bản mới, giữ bản gốc. Khi chỉ yêu cầu ghép khung, chép đủ cả tiêu đề con từ khung được duyệt.
+1. Identify the sources, the latest DOCX, the approved outline and the assigned part. Read what is provided; record missing sources in internal notes. Do not assume the Odoo version or treat customizations as standard features.
+2. **Outline not approved:** produce an outline DOCX (all headings + planned scope) and stop for review. **Approved, or asked to continue:** write the assigned part now without re-asking settled questions. Do not write the remaining chapters on your own.
+3. **Revising:** the DOCX the user last edited is the source. Keep its content, order and deletions; never rebuild from old Markdown or scripts. Write a new version file and keep the original. When asked only to merge the outline, copy every sub-heading from the approved outline.
 
-Đọc [quy ước biên soạn](references/customer-guide.md) khi chọn khung hoặc viết nội dung. Khung hiện có được ưu tiên hơn khung mặc định. Nếu có `authoring-user-guide`, `reviewing-user-guide` hoặc `content-template-gateway`, dùng phần phù hợp; không để cấu trúc mặc định của chúng khôi phục nội dung khách hàng đã bỏ.
+Read [writing conventions](references/customer-guide.md) when choosing the outline or writing content. An existing outline beats the default one. If `authoring-user-guide`, `reviewing-user-guide` or `content-template-gateway` are available, use the relevant parts, but never let their default structure restore content the customer removed.
 
-## Các mặc định cần giữ
+## Defaults to keep
 
-- Tiếng Việt, xưng **“Người dùng”**, câu ngắn, tên chương nghiêm túc. Font tài liệu **Times New Roman**, gồm bảng, chú thích, đầu/chân trang và mục lục.
-- Có giới thiệu tài liệu, tổng quan hệ thống và **hướng dẫn thao tác chung mặc định của Odoo**, ngoài phần nghiệp vụ riêng. Không chép cấu trúc SRS thành cấu trúc tài liệu.
-- Mỗi mục tiêu nghiệp vụ có một hướng dẫn chính. **Mô tả trường và quy tắc ngay tại bước tạo/sửa**, không đẩy hết sang danh mục tra cứu riêng. Không thêm chương thực hành tình huống mẫu hoặc bảng tham chiếu lặp lại nếu không được yêu cầu.
-- Không thêm phụ lục giả định/cần xác nhận vào bản khách hàng. Giữ các điểm chưa rõ trong ghi nhận nội bộ; không biến chúng thành hành vi đã xác nhận. Tránh lời nhắc dài về tài khoản admin, dữ liệu mẫu, môi trường thử hoặc cách đọc tài liệu nếu Người dùng đã bỏ.
-- Mỗi **bước thao tác đã viết** có ảnh ngay sau. Mỗi phần **“Kết quả”** có ảnh ngay sau nội dung kết quả, thể hiện trạng thái thực tế sau thao tác; ưu tiên ảnh sạch để đối chiếu dữ liệu, trạng thái hoặc đầu ra.
-- **Không bắt buộc khoanh đỏ hoặc mũi tên trên mọi ảnh.** Chỉ đánh dấu khi cần chỉ đúng nút/trường hoặc một chi tiết khó nhận biết. Màn hình tổng quan, nội dung đã lưu, bảng báo cáo và kết quả đầu ra rõ ràng dùng ảnh sạch. Khi cần đánh dấu, dùng mũi tên nhỏ/khung mảnh và không che chữ. Tất cả ảnh vẫn có **viền ngoài 1px**, chú thích và mô tả thay thế. Chưa có ảnh thật thì dùng `[ẢNH: màn hình, vị trí và thao tác hoặc kết quả cần minh họa]` trong bản nháp; không tuyên bố đủ ảnh.
-- **Dẫn chiếu ít và có ích.** Chỉ viết “xem mục X.Y” khi Người dùng phải làm một thao tác nhiều bước đã hướng dẫn ở mục khác (mở đúng màn hình, ghi nhận hoàn thành, nơi giải thích trạng thái). Không dẫn chiếu cho thao tác cơ bản như lưu, lọc; không đặt dẫn chiếu trong chú thích hình; không viết câu mô tả cấu trúc tài liệu (“thao tác chung dẫn đến mục 2”) trong bản khách hàng.
-- **Dẫn chiếu mục khác phải bấm được:** khi viết “xem mục X.Y”, Người dùng bấm vào là nhảy tới đầu mục đó. Chạy `scripts/link_section_refs.py` sau khi viết/ghép xong và trước khi thêm viền ảnh; xử lý mọi số mục báo “unresolved”.
-- Tên doanh nghiệp, người phụ trách, sản phẩm và hồ sơ tự nhiên như dữ liệu vận hành; không đặt tên “Khách hàng minh họa”, “Cơ hội hướng dẫn”, “MH…”. Chưa có dữ liệu thật được phép dùng thì tạo dữ liệu hư cấu hợp lý.
+- Vietnamese, address the reader as **“Người dùng”**, short sentences, formal chapter titles. Font **Times New Roman** everywhere: body, tables, captions, header/footer, TOC.
+- Include a document introduction, system overview and **standard Odoo common operations**, besides the business chapters. Do not mirror the SRS structure.
+- One main guide per business goal. **Describe fields and rules right at the create/edit step**, not in a separate reference list. No worked-example chapter or repeated reference tables unless asked.
+- No assumptions/open-questions appendix in the customer copy; keep open points in internal notes and never present them as confirmed behaviour. Skip long reminders about the admin account, sample data, test environment or how to read the guide if the user removed them.
+- Every **written step** has an image right after it. Every **“Kết quả”** paragraph has an image right after it showing the real state after the action; prefer a clean image so data, status or output can be checked.
+- **Annotation is optional.** Mark only when the reader must find a specific button/field or a hard-to-spot detail. Overviews, saved records, report tables and clear outputs use clean images. When marking, use a small arrow or thin frame that covers no text. Every image still gets a **1px outer border**, a caption and alt text. Without a real image yet, draft `[ẢNH: màn hình, vị trí và thao tác hoặc kết quả cần minh họa]`; never claim images are complete.
+- **Few, useful cross-references.** Write “… theo mục X.Y” only when the reader must perform a multi-step task documented elsewhere (open the right screen, mark done, where a status is explained). No references for basic actions such as saving or filtering, none in figure captions, and no sentences describing the document structure (“thao tác chung dẫn đến mục 2”) in the customer copy.
+- **Cross-references must be clickable** and jump to the heading. Run `scripts/link_section_refs.py` after writing/merging and before adding image borders; resolve every number it reports as unresolved.
+- Company, owner, product and record names look like real operating data; never “Khách hàng minh họa”, “Cơ hội hướng dẫn”, “MH…”. Without permitted real data, invent plausible fictional data.
 
-## Chụp và định dạng
+## Screenshots and formatting
 
-Đọc [ảnh và kỹ thuật Word](references/screenshots-and-docx.md) trước khi chụp ảnh hoặc sửa bố cục. Chỉ dùng giao diện thật; không dùng AI tạo/sửa ảnh giao diện. Dùng admin khi được cấp và cho phép, không suy diễn quyền admin sang vai trò khác. Tôn trọng yêu cầu không web search; truy cập Odoo cục bộ không phải tìm kiếm web.
+Read [screenshots and Word technique](references/screenshots-and-docx.md) before capturing or changing layout. Real UI only; never AI-generated or AI-edited UI images. Use admin when granted and allowed; do not infer other roles' rights from admin. Respect a no-web-search request; local Odoo access is not web search.
 
-Khi cần chụp, thực hiện theo [quy trình chụp chạy được](references/capture-workflow.md): kiểm tra môi trường → sao chép add-on mẫu → tạo DB/dữ liệu thử → khai báo từng bước/selector → đăng nhập và chờ UI → lưu ảnh sạch + ảnh đánh dấu + manifest → xem ảnh → chèn Word → dọn DB thử. Mẫu tự chứa nằm ở `assets/odoo_userguide_capture/`, dùng `HttpCase.browser_js` và `Page.captureScreenshot`; không phụ thuộc một skill chụp ảnh khác.
+To capture, follow the [runnable capture workflow](references/capture-workflow.md): check environment → copy the template add-on → create temp DB and data → declare frames/selectors → log in and wait for UI → save clean + annotated images + manifest → review images → insert into Word → drop the temp DB. The self-contained template lives in `assets/odoo_userguide_capture/` and uses `HttpCase.browser_js` with `Page.captureScreenshot`; it does not depend on another skill.
 
-- `scripts/screenshot_annotations.js`: chỉ gắn mũi tên nhỏ và tính vùng chụp; add-on mẫu mới là phần điều khiển trình duyệt, chụp PNG và ghi manifest.
-- `scripts/style_docx_images.py INPUT.docx OUTPUT.docx`: thêm viền Word 0,75pt, tương đương 1px ở 96dpi; giữ nội dung và dữ liệu ảnh.
-- `scripts/link_section_refs.py INPUT.docx OUTPUT.docx`: biến mọi dẫn chiếu “mục 2.7”, “mục 2.9–2.11”, “mục 4.4 và 4.5” thành liên kết nội bộ tới đầu đề mục; báo số mục không tồn tại.
-- `scripts/check_docx.py FILE.docx --require-step-images`: kiểm tra cấu trúc, font, viền và ảnh theo bước. Bản khung dùng lệnh không có `--require-step-images`.
+- `scripts/screenshot_annotations.js`: only draws the small arrow/frame and computes the crop; the template add-on drives the browser, writes PNGs and the manifest.
+- `scripts/style_docx_images.py INPUT.docx OUTPUT.docx`: adds a 0.75pt (1px at 96dpi) Word border; keeps text and image data.
+- `scripts/link_section_refs.py INPUT.docx OUTPUT.docx`: turns “mục 2.7”, “mục 2.9–2.11”, “mục 4.4 và 4.5” into blue, underlined internal links to the heading; reports numbers with no heading.
+- `scripts/check_docx.py FILE.docx --require-step-images`: checks structure, fonts, borders and per-step images. For an outline DOCX omit `--require-step-images`.
 
-## Trước khi bàn giao
+## Before handing over
 
-Đối chiếu phạm vi và bản gốc: không mất chỉnh sửa thủ công, không thêm lại phần đã xóa, không viết vượt phần được giao. Rà soát riêng ảnh của từng bước và từng phần “Kết quả”. Xem từng ảnh, bỏ đánh dấu không cần thiết, kiểm tra mũi tên không che chữ và viền đủ mảnh. Kết xuất Word/PDF bằng công cụ sẵn có để kiểm tra bố cục và cập nhật mục lục; kiểm tra tự động không thay thế xem bản kết xuất. Ghi rõ kiểm tra nào chưa thực hiện trong ghi nhận nội bộ và nêu giới hạn ảnh hưởng trực tiếp tới bàn giao.
+Compare with scope and source: no lost manual edits, no restored deletions, nothing beyond the assigned part. Review images per step and per “Kết quả”: open each one, drop unnecessary marks, check arrows cover no text and borders are thin. Render to PDF with an available tool to check layout, TOC page numbers and that links land on the right page; automated checks do not replace looking at the render. Record skipped checks in internal notes and state limits that affect the handover.
 
-Trả liên kết **DOCX**, tóm tắt ngắn thay đổi và phần chưa viết. Không gửi Markdown thay cho Word, không công bố/commit/push tài liệu hoặc skill nếu chưa được giao.
+Reply in Vietnamese with the **DOCX** link, a short change summary and what is not yet written. Do not send Markdown instead of Word. Do not publish, commit or push the document or the skill unless asked.
