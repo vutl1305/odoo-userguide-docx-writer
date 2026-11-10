@@ -34,4 +34,11 @@ class Tools(unittest.TestCase):
  def test_checker_finds_wrong_font(self):
   d=Document(self.source);d.paragraphs[1].runs[0].font.name='Arial';d.save(self.source);out=self.root/'bordered.docx';self.run_script('style_docx_images.py',self.source,out)
   r=self.run_script('check_docx.py',out);self.assertEqual(r.returncode,1,r.stdout+r.stderr);self.assertTrue(any('font' in s for s in json.loads(r.stdout)['issues']))
+ def test_links_section_references_to_headings(self):
+  d=Document(self.source);d.add_heading('2.7. Lưu thông tin',2);d.add_paragraph('Trước khi đăng xuất, lưu theo mục 2.7 và mục 9.9.');d.save(self.source)
+  out=self.root/'linked.docx';r=self.run_script('link_section_refs.py',self.source,out);self.assertEqual(r.returncode,0,r.stderr);self.assertIn("unresolved: ['9.9']",r.stdout)
+  W='{http://schemas.openxmlformats.org/wordprocessingml/2006/main}';d=Document(out)
+  marks={e.get(W+'name'):p.text for p in d.paragraphs for e in p._p.iter(W+'bookmarkStart')}
+  links=[(''.join(t.text for t in h.iter(W+'t')),marks[h.get(W+'anchor')]) for h in d.paragraphs[-1]._p.iter(W+'hyperlink')]
+  self.assertEqual(links,[('mục 2.7','2.7. Lưu thông tin')]);self.assertTrue(next(d.paragraphs[-1]._p.iter(W+'hyperlink')).findall('.//'+W+'u'));self.assertEqual(d.paragraphs[-1].text,'Trước khi đăng xuất, lưu theo mục 2.7 và mục 9.9.')
 if __name__=='__main__':unittest.main()

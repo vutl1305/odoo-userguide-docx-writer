@@ -23,6 +23,8 @@ Soạn tài liệu để khách hàng không chuyên kỹ thuật thực hiện 
 - Không thêm phụ lục giả định/cần xác nhận vào bản khách hàng. Giữ các điểm chưa rõ trong ghi nhận nội bộ; không biến chúng thành hành vi đã xác nhận. Tránh lời nhắc dài về tài khoản admin, dữ liệu mẫu, môi trường thử hoặc cách đọc tài liệu nếu Người dùng đã bỏ.
 - Mỗi **bước thao tác đã viết** có ảnh ngay sau. Mỗi phần **“Kết quả”** có ảnh ngay sau nội dung kết quả, thể hiện trạng thái thực tế sau thao tác; ưu tiên ảnh sạch để đối chiếu dữ liệu, trạng thái hoặc đầu ra.
 - **Không bắt buộc khoanh đỏ hoặc mũi tên trên mọi ảnh.** Chỉ đánh dấu khi cần chỉ đúng nút/trường hoặc một chi tiết khó nhận biết. Màn hình tổng quan, nội dung đã lưu, bảng báo cáo và kết quả đầu ra rõ ràng dùng ảnh sạch. Khi cần đánh dấu, dùng mũi tên nhỏ/khung mảnh và không che chữ. Tất cả ảnh vẫn có **viền ngoài 1px**, chú thích và mô tả thay thế. Chưa có ảnh thật thì dùng `[ẢNH: màn hình, vị trí và thao tác hoặc kết quả cần minh họa]` trong bản nháp; không tuyên bố đủ ảnh.
+- **Dẫn chiếu ít và có ích.** Chỉ viết “xem mục X.Y” khi Người dùng phải làm một thao tác nhiều bước đã hướng dẫn ở mục khác (mở đúng màn hình, ghi nhận hoàn thành, nơi giải thích trạng thái). Không dẫn chiếu cho thao tác cơ bản như lưu, lọc; không đặt dẫn chiếu trong chú thích hình; không viết câu mô tả cấu trúc tài liệu (“thao tác chung dẫn đến mục 2”) trong bản khách hàng.
+- **Dẫn chiếu mục khác phải bấm được:** khi viết “xem mục X.Y”, Người dùng bấm vào là nhảy tới đầu mục đó. Chạy `scripts/link_section_refs.py` sau khi viết/ghép xong và trước khi thêm viền ảnh; xử lý mọi số mục báo “unresolved”.
 - Tên doanh nghiệp, người phụ trách, sản phẩm và hồ sơ tự nhiên như dữ liệu vận hành; không đặt tên “Khách hàng minh họa”, “Cơ hội hướng dẫn”, “MH…”. Chưa có dữ liệu thật được phép dùng thì tạo dữ liệu hư cấu hợp lý.
 
 ## Chụp và định dạng
@@ -33,6 +35,7 @@ Khi cần chụp, thực hiện theo [quy trình chụp chạy được](referen
 
 - `scripts/screenshot_annotations.js`: chỉ gắn mũi tên nhỏ và tính vùng chụp; add-on mẫu mới là phần điều khiển trình duyệt, chụp PNG và ghi manifest.
 - `scripts/style_docx_images.py INPUT.docx OUTPUT.docx`: thêm viền Word 0,75pt, tương đương 1px ở 96dpi; giữ nội dung và dữ liệu ảnh.
+- `scripts/link_section_refs.py INPUT.docx OUTPUT.docx`: biến mọi dẫn chiếu “mục 2.7”, “mục 2.9–2.11”, “mục 4.4 và 4.5” thành liên kết nội bộ tới đầu đề mục; báo số mục không tồn tại.
 - `scripts/check_docx.py FILE.docx --require-step-images`: kiểm tra cấu trúc, font, viền và ảnh theo bước. Bản khung dùng lệnh không có `--require-step-images`.
 
 ## Trước khi bàn giao

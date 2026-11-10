@@ -41,6 +41,7 @@ Hộp chọn tệp của hệ điều hành có thể không xuất hiện trong
 
 - Dùng công cụ Word/DOCX sẵn có; `python-docx` phù hợp khi đã cài. Không đổi mọi tài liệu sang một bộ script cũ làm mất sửa đổi thủ công.
 - A4, lề và cỡ chữ nhất quán; Times New Roman cho nội dung, bảng, Heading, chú thích, mục lục, đầu/chân trang. Font giao diện bên trong ảnh giữ nguyên Odoo.
+- Dẫn chiếu “mục X.Y” trong nội dung là liên kết nội bộ (`w:hyperlink w:anchor`) tới bookmark của đề mục, có **màu xanh và gạch chân trực tiếp** (không chỉ dựa vào kiểu Hyperlink vì nhiều DOCX không định nghĩa kiểu này, khiến liên kết trông như chữ thường); vùng bấm gồm cả cụm “mục X.Y”. Trong Word cần Ctrl + bấm (tùy thiết lập); trong PDF bấm trực tiếp. Kiểm tra trong bản PDF kết xuất rằng liên kết đến đúng trang.
 - Dùng Heading thật, giữ cấp tiêu đề và đánh số, mục lục tự động có số trang. Dùng cấp mục lục phù hợp để tìm đầu mục phân công. Cập nhật mục lục sau khi thay ảnh/font.
 - Chèn ảnh trực tiếp để DOCX tự chứa; giữ tỷ lệ, không kéo giãn, không ép ảnh chữ nhỏ thành hình không đọc được. Gắn bước với ảnh và ảnh với chú thích để tránh tách rời qua trang. Thêm mô tả thay thế.
 - Viền ngoài **1px = 0,75pt = 9525 EMU** ở 96dpi, màu xám mảnh. Công cụ `style_docx_images.py` đặt viền ở thuộc tính ảnh Word, không làm thay đổi pixel giao diện. Nếu đầu ra yêu cầu PNG có viền raster riêng thì thêm đúng 1 pixel ở mép ngoài, không đè lên ảnh, bằng công cụ ảnh được cho phép.
@@ -50,7 +51,8 @@ Hộp chọn tệp của hệ điều hành có thể không xuất hiện trong
 ## Kiểm tra có thể chạy lại
 
 ```bash
-python3 scripts/style_docx_images.py source.docx revised.docx
+python3 scripts/link_section_refs.py source.docx linked.docx
+python3 scripts/style_docx_images.py linked.docx revised.docx
 python3 scripts/check_docx.py revised.docx --require-step-images
 ```
 
