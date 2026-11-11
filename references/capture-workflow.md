@@ -8,6 +8,36 @@ Use when the guide needs real images. This covers **driving the browser and capt
 - Only a running test system: use the browser tool you were given to log in, navigate and capture. Still follow clean → annotate → capture → manifest; never swap DBs, install modules or create data on a production system.
 - No suitable browser/environment/login: keep writing the parts that need no image, leave draft image placeholders and log the gap. Never substitute AI-made UI or claim images were captured.
 
+### Ask first, then reuse
+
+Do not rebuild the environment on every request. **Before the first capture of a task**, read the project's capture note (see below). If it is missing or stale, ask the user **once, in one message**:
+
+1. **Database:** use an existing DB (name it; a dev/test DB with the needed modules and data, never production), reuse the capture DB from a previous run, or let the agent create a new one.
+2. **Runtime:** give the Python interpreter, Odoo config, addons paths and a free port, or let the agent find them in the project (`setup/*.conf`, `*.conf`, venvs, `odoo-bin`), or let it create a private config.
+
+If the user says “tự làm”, discover first (existing config, venv, existing DBs), propose what you found and create only what is missing. Record the decision in a **capture note** inside the project (e.g. `<guide assets dir>/capture_env.md`): Python path, Odoo root, config path, addons path, DB name, its `data_dir`, port, who created the DB, date. No passwords. Next time, reuse it after a quick preflight instead of asking again; ask only when the preflight fails or the user wants a change.
+
+**A DB and its filestore are a pair.** Reusing a DB means reusing the `data_dir` it was created with. A DB pointed at a new or empty `data_dir` serves empty JS/CSS bundles and shows “Rất tiếc! / Oops” dialogs. Preflight a reused DB (`UG_CONFIG` = the config that will serve it):
+
+```bash
+"$UG_PY" - <<'EOF'
+import configparser, os, psycopg2
+from pathlib import Path
+o = configparser.ConfigParser(interpolation=None); o.read(os.environ['UG_CONFIG']); o = o['options']
+db = os.environ['UG_CAPTURE_DB']
+kw = {k: o.get('db_' + k) for k in ('host', 'port', 'user', 'password') if o.get('db_' + k) not in (None, '', 'False')}
+with psycopg2.connect(dbname=db, **kw) as c, c.cursor() as cur:
+    cur.execute("SELECT store_fname FROM ir_attachment WHERE store_fname IS NOT NULL ORDER BY id DESC LIMIT 200")
+    root = Path(o.get('data_dir') or Path.home() / '.local/share/Odoo') / 'filestore' / db
+    missing = sum(not (root / f).exists() for (f,) in cur.fetchall())
+print('missing filestore files:', missing)  # > 0: wrong data_dir, or regenerate assets (see Common problems)
+EOF
+```
+
+When the modules or `depends` of the capture add-on change, update them on the reused DB (`-u odoo_userguide_capture` or `-i <module>`) instead of creating a new DB. Seed data in `setUpClass` is rolled back after each test class, so a reused DB stays clean.
+
+### Facts to determine
+
 Determine the Odoo version, compatible Python, addons paths (standard, Enterprise, custom), PostgreSQL connection config, language, the account you may use and a free HTTP port. Read the real code/UI before choosing selectors. Do not assume the system Python can run the project's Odoo.
 
 From the Odoo source dir, preflight with Odoo's Python: `python -c "import odoo, psycopg2, websocket"`; check Chrome with `google-chrome --version`. Missing `websocket-client` makes browser tests skip silently: install it into a temp dir (`python -m pip install --target "$UG_WORK/pylib" websocket-client`) and add it to `PYTHONPATH` instead of modifying the Odoo environment. Exit code 0 is not proof that images exist.
@@ -23,9 +53,10 @@ export UG_PY="/path/to/odoo-compatible-python"
 export UG_SOURCE_CONFIG="/path/to/existing-odoo.conf"
 export UG_ADDONS_PATH="/path/addons,/path/enterprise,/path/customaddons"
 export UG_WORK="$(mktemp -d /tmp/ug-capture.XXXXXX)"
-export UG_CAPTURE_DB="ug_$(python3 -c 'import uuid; print(uuid.uuid4().hex[:12])')"
+export UG_CAPTURE_DB="<DB chosen with the user>"   # new DB: ug_<short name>
 export UG_CAPTURE_OUTPUT="$UG_WORK/shots"
 export UG_HTTP_PORT="8099"
+export UG_CONFIG="$UG_WORK/odoo.conf"
 mkdir -p "$UG_WORK/addons"
 cp -R "$UG_SKILL/assets/odoo_userguide_capture" "$UG_WORK/addons/"
 cp "$UG_SKILL/scripts/screenshot_annotations.js" "$UG_WORK/addons/odoo_userguide_capture/tests/annotations.js"
@@ -59,7 +90,7 @@ print('Temp config written; connection details not printed.')
 PY
 ```
 
-`UG_CAPTURE_DB` must be a fresh temp DB for this run. The runner refuses any other DB before seeding. Never put a production DB name here to save time.
+**Reusing a DB the user named:** skip the config script; copy the config that already serves that DB to `$UG_WORK/odoo.conf` and change only `addons_path` (append `$UG_WORK/addons`), `http_port`, `logfile` (`$UG_WORK/odoo.log`) and `max_cron_threads=0`. Keep its `db_name` and `data_dir`. Installing the capture add-on changes that DB, so say so when asking. **Creating a new DB:** use the script and prefix the name with `ug_`. The runner seeds only the DB named by `UG_CAPTURE_DB` and refuses any other. Never use a production DB.
 
 ## 3. Write the data and the frames
 
@@ -79,6 +110,9 @@ Edit the **copy** in `$UG_WORK/addons`, never Odoo core:
 | `clean` | Only the clean image (overviews, “Kết quả”). |
 | `box_only` | Thin frame, no arrow: target sits next to text. |
 | `full` | Whole 1440×900 viewport. |
+| `target_js` | JS expression for the target when a selector is not enough, e.g. `byText('.dropdown-item', 'Xóa', 'Delete')` (ignores accents and case; fails if nothing matches). |
+| `clip_rect`, `min_h`, `max_h`, `max_w` | Fixed crop rectangle, or clamp the computed crop in px. |
+| `expect_error` | Only for a frame that deliberately documents an Odoo error/warning message. |
 | `navigate` + `ready` | Action that loads a new page (login submit, logout, save-and-reload). The runner fires it, waits until `ready` exists on the new page, then reloads the helper. |
 
 Built-in examples, verified on Odoo 20 with only `base, web`:
@@ -96,23 +130,25 @@ For create/edit flows, pass `finish_js` to save or discard **through the real UI
 
 Full page loads destroy the old JS context and overlay. Use `navigate` + `ready` instead of clicking inside `prepare`; never catch `Execution context was destroyed` and treat it as success.
 
+Use `byText`/`el`/`until`, which fail on a miss. Never write silent fallbacks (`|| el('.dropdown-menu')`, `if (btn) btn.click()`): they box the wrong element or skip a click, and the run still “passes”. Need a new frame option? Add it to the template in this skill and copy the template; do not fork `capture_steps` in the project, because a fork silently loses the error checks.
+
 ## 4. Run Odoo and capture
 
 Run from the Odoo source dir. Flags verified on Odoo 20; check `odoo-bin --help` for other versions:
 
 ```bash
 cd "$UG_ODOO_ROOT"
-PYTHONPATH="$UG_WORK/pylib" "$UG_PY" odoo-bin -c "$UG_WORK/odoo.conf" \
+PYTHONPATH="$UG_WORK/pylib" "$UG_PY" odoo-bin -c "$UG_CONFIG" \
   -i odoo_userguide_capture --without-demo=True --load-language=vi_VN \
   --stop-after-init --no-http
 UG_CAPTURE_DB="$UG_CAPTURE_DB" UG_CAPTURE_OUTPUT="$UG_CAPTURE_OUTPUT" \
-PYTHONPATH="$UG_WORK/pylib" "$UG_PY" odoo-bin -c "$UG_WORK/odoo.conf" \
+PYTHONPATH="$UG_WORK/pylib" "$UG_PY" odoo-bin -c "$UG_CONFIG" \
   --test-enable --test-tags /odoo_userguide_capture:TestGuideCapture \
   --screenshots="$UG_WORK/debug" --stop-after-init
 grep -E "tests when loading|AssertionError" "$UG_WORK/odoo.log" | tail -3
 ```
 
-The first command creates the DB and installs the declared dependencies (an "Importing test framework" ERROR line here is harmless). The second **needs HTTP**: `browser_js` logs in and opens pages through the server, so do not carry `--no-http` over. Success is `0 failed, 0 error(s)` plus the manifest, not the exit code.
+Run the first command only for a new DB, or with `-u odoo_userguide_capture` instead of `-i` when the reused DB needs updated modules. It creates the DB and installs the declared dependencies (an "Importing test framework" ERROR line here is harmless). The second **needs HTTP**: `browser_js` logs in and opens pages through the server, so do not carry `--no-http` over. Success is `0 failed, 0 error(s)` plus the manifest, not the exit code.
 
 Version-specific API: the runner uses `ChromeBrowser._wait_code_ok` and `_websocket_request`; Odoo 20 config params use `set_str` (older: `set_param`; the template handles both). If an API differs, read `odoo/tests/common.py` and adapt the runner copy; never patch the framework.
 
@@ -121,10 +157,11 @@ Version-specific API: the runner uses `ChromeBrowser._wait_code_ok` and `_websoc
 1. Opens the URL (logged in or not), sets the viewport to **1440 × 900**, scale 1.
 2. Runs `navigate` (wait for `ready`) or `prepare`, waits for the real target, waits for paint.
 3. Loads `annotations.js`, computes the arrow and the crop (`clip`/`context`). The overlay is non-interactive and changes no Odoo value or button.
-4. Hides the overlay and calls **`Page.captureScreenshot`** (`format='png'`, the crop) → clean PNG.
-5. Unless `clean`, shows the overlay and captures the same crop → annotated PNG; a fresh browser capture, not an edited image.
-6. Writes metadata, coordinates, URL and SHA256 of both images; clears the overlay.
-7. Finishes the flow (`finish_js`), checks for unsaved forms and browser errors, then writes `manifest-<flow>.json`. On a failing frame it saves a full-viewport image in `debug/` and fails the test.
+4. **Fails the test if an Odoo error dialog (`.o_error_dialog`: Oops / Rất tiếc / UserError) is visible** — report it to the user, never capture it (`expect_error: True` only when the guide documents that message).
+5. Hides the overlay and calls **`Page.captureScreenshot`** (`format='png'`, the crop) → clean PNG.
+6. Unless `clean`, shows the overlay and captures the same crop → annotated PNG; a fresh browser capture, not an edited image.
+7. Writes metadata, coordinates, URL and SHA256 of both images; clears the overlay.
+8. Finishes the flow (`finish_js`), checks for unsaved forms and browser errors, then writes `manifest-<flow>.json`. On a failing frame it saves a full-viewport image in `debug/` and fails the test.
 
 ```python
 encoded = browser._websocket_request('Page.captureScreenshot', params={
@@ -171,7 +208,7 @@ Copy images, manifest **and the adapted add-on** into a persistent project folde
 
 ## 7. Clean up
 
-Wait for Odoo and Chrome to exit. Keep the used images/manifest until the DOCX embeds them. Drop only the temp DB created by this run, reading the temp config without printing connection details:
+Wait for Odoo and Chrome to exit. Keep the used images/manifest until the DOCX embeds them. **Keep the DB, config and `data_dir` by default** so the next part of the guide reuses them, and update the capture note. Never drop a DB the user provided. Drop a DB the agent created only when the user asks or the guide is finished, reading the temp config without printing connection details:
 
 ```bash
 "$UG_PY" - <<'PY'
@@ -205,6 +242,8 @@ PY
 | --- | --- |
 | DB selector page instead of Odoo | `db_name` and `dbfilter` must name the same temp DB; check port and URL. |
 | Test ends without images | Chrome, websocket-client on `PYTHONPATH`, test tags, frame count, manifest; a skipped test is not a capture. |
+| Error dialog “Rất tiếc / Oops” or test fails at a step | Read the dialog text and `odoo.log`; fix the cause (e.g. missing filestore after recreating `data_dir` → `DELETE FROM ir_attachment WHERE url LIKE '/web/assets/%'`), recapture, and tell the user. Never keep a custom runner that skips HttpCase's final error check. |
+| Selector fallback (`\|\| el('.dropdown-menu')`, `if(btn)`) | Do not use: a missed target must fail, not box the wrong element. Match labels robustly (Odoo 20 writes “Xoá”, not “Xóa”). |
 | Button not found / selector timeout | Modules, role, language, version, record state, real DOM; fix the selector, never invent a button. |
 | Right label, wrong element | Use a specific selector (e.g. `button.o_user_menu`, the table not the view switcher). |
 | Spinner or stale values | Wait for the UI change with `until`, then `paint` before capturing. |

@@ -9,7 +9,7 @@ With Odoo source available, use the skill's self-contained template in `assets/o
 - Use natural fictional names such as “Công ty TNHH Dinh dưỡng An Phú”, “Nguyễn Minh Anh”, “An Phú – H-Meal tháng 11”. Never put “minh họa”, “hướng dẫn”, “test” or an “MH” prefix in displayed names. Real customer names/PII are not needed for this.
 - Create records through the system/ORM in the test environment; never alter text, values or states on an image to fake a working UI.
 - Do not print config secrets. Do not infer other roles' rights from this environment. Do not send external email/chat just to get an image.
-- Afterwards drop exactly the temp DB this task created; check the exact name, never the source DB, never mass-delete by name pattern.
+- Keep the capture DB with its `data_dir` for the next part and record it in the capture note. Drop only a DB the agent created, only when the user asks or the guide is done; check the exact name, never the source DB, never mass-delete by name pattern.
 
 ## Images for steps and for “Kết quả”
 

@@ -2,22 +2,28 @@
 
 Read references/capture-workflow.md first. Copy scripts/screenshot_annotations.js
 next to this file as annotations.js. Adapt depends, setUpClass, URLs, selectors
-and frames to the target project. Runs only on the disposable ug_* database named
-by UG_CAPTURE_DB; writes to UG_CAPTURE_OUTPUT/<flow>/{raw,annotated,metadata,debug}.
+and frames to the target project. Runs only on the database named by UG_CAPTURE_DB
+(the DB the user chose or allowed, never production); writes to UG_CAPTURE_OUTPUT/<flow>/{raw,annotated,metadata,debug}.
 
 Frame keys (one frame = one documented step or one "Kết quả" image):
   id, section, instruction, phase ('before'|'after')  required, recorded in manifest
-  target      CSS selector of the element the step is about (required)
+  target      CSS selector of the element the step is about (required unless target_js)
+  target_js   JS expression resolving to the element, e.g. byText('.dropdown-item', 'xoa', 'delete')
   prepare     JS run first to reach the state (click, fill); use el/until/click/paint
   context     selector whose box must stay inside the default crop
   clip        list of selectors; crop = union of their boxes + pad (default 24px)
   pad         padding for clip
+  clip_rect   fixed crop {x, y, width, height} instead of clip
+  min_h/max_h/max_w  clamp the crop height/width in px
   no_union    with clip: do not widen the crop to the annotation (box-only shots)
   clean       capture only the unannotated image (overviews, "Kết quả")
   box_only    thin frame around target, no arrow (target next to text)
   full        crop = whole 1440x900 viewport
   navigate    JS that triggers a full page load (login submit, logout, reload)
   ready       selector that proves the new page is usable (required with navigate)
+  expect_error  allow a visible Odoo error dialog (only when the guide documents that message)
+Never add silent fallbacks (`|| el(...)`, `if (btn)`): a missed target must fail the test.
+Add new frame keys here, in the skill template, not in a per-project copy of capture_steps.
 """
 import base64
 import hashlib
@@ -44,6 +50,12 @@ const click = async selector => {
   if (element.disabled) throw new Error('Disabled control: ' + selector);
   element.click();
 };
+// Match a visible element by its label, ignoring Vietnamese accents and case
+// (Odoo writes "Xoá" while people type "Xóa"). Fails when nothing matches.
+const fold = t => (t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase().replace(/\s+/g, ' ').trim();
+const byText = async (selector, ...labels) => until(() => [...document.querySelectorAll(selector)].filter(visible)
+  .find(e => labels.some(l => fold(e.innerText || e.title || e.getAttribute('aria-label')).includes(fold(l)))),
+  selector + ' with label ' + labels.join(' / '));
 const paint = async () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 '''
 
@@ -54,8 +66,8 @@ class TestGuideCapture(HttpCase):
     @classmethod
     def setUpClass(cls):
         expected = os.environ.get('UG_CAPTURE_DB', '')
-        if not expected.startswith('ug_'):
-            raise AssertionError('UG_CAPTURE_DB must name the disposable ug_* database created for this run')
+        if not expected:
+            raise AssertionError('Set UG_CAPTURE_DB to the capture database the user chose or allowed')
         super().setUpClass()
         if cls.env.cr.dbname != expected:
             raise AssertionError('Refusing to seed a database other than UG_CAPTURE_DB')
@@ -105,6 +117,12 @@ class TestGuideCapture(HttpCase):
             path.write_bytes(data)
             return hashlib.sha256(data).hexdigest()
 
+        def assert_no_odoo_error(browser, step):
+            # Odoo error/warning dialogs (Oops/Rất tiếc, UserError...) must stop the capture, never be shot.
+            msg = evaluate(browser, "const d=[...document.querySelectorAll('.o_error_dialog')].find(visible);return d?d.innerText.trim().slice(0,500):'';")
+            if msg:
+                raise AssertionError(f'Odoo shows an error dialog at step {step} - fix it, do not capture:\n{msg}')
+
         def run(browser, *args, **kwargs):
             browser._websocket_request('Emulation.setDeviceMetricsOverride', params={
                 'width': 1440, 'height': 900, 'deviceScaleFactor': 1, 'mobile': False,
@@ -115,10 +133,10 @@ class TestGuideCapture(HttpCase):
                 step = frame['id']
                 try:
                     if frame.get('navigate'):
-                        evaluate(browser, 'setTimeout(async()=>{' + frame['navigate'] + '},50);return true;')
+                        evaluate(browser, "document.body.classList.add('ug_old_page');setTimeout(async()=>{" + frame['navigate'] + "},50);return true;")
                         for _ in range(200):
                             try:
-                                if evaluate(browser, 'return !!document.querySelector(' + json.dumps(frame['ready']) + ');'):
+                                if evaluate(browser, 'return !document.body.classList.contains("ug_old_page") && !!document.querySelector(' + json.dumps(frame['ready']) + ');'):
                                     break
                             except Exception:
                                 pass
@@ -128,7 +146,10 @@ class TestGuideCapture(HttpCase):
                         evaluate(browser, "await new Promise(r=>setTimeout(r,1500));")
                         browser._websocket_request('Runtime.evaluate', params={'expression': annotations})
                     setup = frame.get('prepare', '') + '\n'
-                    setup += 'const target = await el(' + json.dumps(frame['target']) + ');'
+                    if frame.get('target_js'):
+                        setup += 'const target = await (' + frame['target_js'] + ');if(!target)throw new Error("target_js found nothing");'
+                    else:
+                        setup += 'const target = await el(' + json.dumps(frame['target']) + ');'
                     setup += 'const context = ' + ('await el(' + json.dumps(frame['context']) + ')' if frame.get('context') else "target.closest('.modal-content')") + ';'
                     setup += 'await paint(); const shot = OdooUserGuide.annotate(target, {step:' + json.dumps(step) + ',context});'
                     setup += "document.getElementById('odoo-userguide-annotation').style.visibility='hidden';"
@@ -136,7 +157,9 @@ class TestGuideCapture(HttpCase):
                     shot = evaluate(browser, setup)
                     raw, marked = output/'raw'/f'{step}.png', output/'annotated'/f'{step}.png'
                     shot['annotate_clip'] = shot['clip']
-                    if frame.get('clip'):
+                    if frame.get('clip_rect'):
+                        shot['clip'] = {**frame['clip_rect'], 'scale': 1}
+                    elif frame.get('clip'):
                         shot['clip'] = evaluate(browser, 'const r=' + json.dumps(frame['clip']) + '.flatMap(q=>[...document.querySelectorAll(q)].filter(visible)).map(e=>e.getBoundingClientRect());'
                             'const p=' + str(frame.get('pad', 24)) + ';const x=Math.max(0,Math.min(...r.map(b=>b.left))-p),y=Math.max(0,Math.min(...r.map(b=>b.top))-p);'
                             'return {x,y,width:Math.min(innerWidth,Math.max(...r.map(b=>b.right))+p)-x,height:Math.min(innerHeight,Math.max(...r.map(b=>b.bottom))+p)-y,scale:1};')
@@ -146,10 +169,19 @@ class TestGuideCapture(HttpCase):
                             shot['clip'] = {'x': x, 'y': y, 'scale': 1,
                                 'width': max(a['x'] + a['width'], c['x'] + c['width']) - x,
                                 'height': max(a['y'] + a['height'], c['y'] + c['height']) - y}
+                    clip = shot['clip']
+                    if frame.get('min_h'):
+                        clip['height'] = min(900 - clip['y'], max(clip['height'], frame['min_h']))
+                    if frame.get('max_h'):
+                        clip['height'] = min(clip['height'], frame['max_h'])
+                    if frame.get('max_w'):
+                        clip['width'] = min(clip['width'], frame['max_w'])
                     if frame.get('box_only'):
                         evaluate(browser, "document.querySelectorAll('#odoo-userguide-annotation path').forEach(e=>e.remove());")
                     if frame.get('full'):
                         shot['clip'] = {'x': 0, 'y': 0, 'width': 1440, 'height': 900, 'scale': 1}
+                    if not frame.get('expect_error'):
+                        assert_no_odoo_error(browser, step)
                     raw_sha = png(browser, shot['clip'], raw)
                     if frame.get('clean'):
                         marked, marked_sha = raw, raw_sha

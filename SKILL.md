@@ -31,12 +31,30 @@ Read [writing conventions](references/customer-guide.md) when choosing the outli
 
 Read [screenshots and Word technique](references/screenshots-and-docx.md) before capturing or changing layout. Real UI only; never AI-generated or AI-edited UI images. Use admin when granted and allowed; do not infer other roles' rights from admin. Respect a no-web-search request; local Odoo access is not web search.
 
-To capture, follow the [runnable capture workflow](references/capture-workflow.md): check environment → copy the template add-on → create temp DB and data → declare frames/selectors → log in and wait for UI → save clean + annotated images + manifest → review images → insert into Word → drop the temp DB. The self-contained template lives in `assets/odoo_userguide_capture/` and uses `HttpCase.browser_js` with `Page.captureScreenshot`; it does not depend on another skill.
+To capture, follow the [runnable capture workflow](references/capture-workflow.md): read the capture note or ask the user → preflight → copy the template add-on → seed data → declare frames/selectors → log in and wait for UI → save clean + annotated images + manifest → review images → insert into Word → keep the DB and update the note. **Do not rebuild the environment each time:** before the first capture, ask the user in one message which DB to use (an existing dev/test DB, the previous capture DB, or let the agent create one) and which runtime (Python, config, addons path, port, or let the agent find or create them). Save the answer in the project's capture note and reuse it next time; a DB always goes with its own `data_dir`. Extend the template in this skill instead of forking `capture_steps` in the project. The self-contained template lives in `assets/odoo_userguide_capture/` and uses `HttpCase.browser_js` with `Page.captureScreenshot`; it does not depend on another skill.
 
 - `scripts/screenshot_annotations.js`: only draws the small arrow/frame and computes the crop; the template add-on drives the browser, writes PNGs and the manifest.
 - `scripts/style_docx_images.py INPUT.docx OUTPUT.docx`: adds a 0.75pt (1px at 96dpi) Word border; keeps text and image data.
 - `scripts/link_section_refs.py INPUT.docx OUTPUT.docx`: turns “mục 2.7”, “mục 2.9–2.11”, “mục 4.4 và 4.5” into blue, underlined internal links to the heading; reports numbers with no heading.
 - `scripts/check_docx.py FILE.docx --require-step-images`: checks structure, fonts, borders and per-step images. For an outline DOCX omit `--require-step-images`.
+
+## Stop and report on errors
+
+An error seen while capturing or building is a finding for the user, never something to capture around.
+
+- **Stop the capture** when the UI shows an Odoo error/warning dialog (“Rất tiếc!”, “Oops”, UserError, access error, traceback), the browser console or `odoo.log` has `ERROR`/`Traceback`/`Uncaught`, a selector misses, or a step reaches the wrong screen. Do not continue to the next frame, do not use earlier images and do not build the DOCX from that run.
+- **Never hide failures:** keep the runner's `.o_error_dialog` check and HttpCase's final console check; no selector fallbacks (`|| el(...)`, `if(btn)`, `try { } catch {}` that continue silently). A missed target must fail the test. `expect_error: True` only for a frame that deliberately documents a business message.
+- **`0 failed` is not enough:** after every run, check the log with a bounded summary, then look at the images:
+  `grep -E " ERROR |Traceback|Uncaught" odoo.log | grep -v "Importing test framework" | cut -c1-200 | sort | uniq -c | sort -rn | head -20`
+  (the only known harmless line is “Importing test framework”). Read full tracebacks only for the lines this shows.
+- **Report to the user** (in Vietnamese): which step, the exact message or log line, the likely cause with evidence, and whether it is a temp-environment problem (missing filestore, module not installed, stale assets) or a real system/customization bug. Fix environment problems and recapture; for a possible system bug, stop and ask before going on, and never document the faulty behaviour as correct.
+- The same applies to build scripts: a failed assert, `check_docx` issue or unresolved reference stops the handover until fixed or reported.
+
+## Safety in the user's repository
+
+- Never use `git stash`, `git reset`, `git checkout -- <path>`, `git clean` or branch switches to test or compare something; copy the file to `/tmp` instead. `.claude/` and guide asset folders may be git-ignored, so `git stash` saves nothing and `git stash pop` then applies the user's **old** stash.
+- If a git command changes the user's tracked files by mistake, stop, show `git status` and `git stash list`, and ask before restoring anything.
+- Write debug images only under the capture output (`<flow>/debug/`), never in the repo root. Never drop a DB the user provided.
 
 ## Before handing over
 
