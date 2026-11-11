@@ -42,11 +42,9 @@ To capture, follow the [runnable capture workflow](references/capture-workflow.m
 
 An error seen while capturing or building is a finding for the user, never something to capture around.
 
-- **Stop the capture** when the UI shows an Odoo error/warning dialog (“Rất tiếc!”, “Oops”, UserError, access error, traceback), the browser console or `odoo.log` has `ERROR`/`Traceback`/`Uncaught`, a selector misses, or a step reaches the wrong screen. Do not continue to the next frame, do not use earlier images and do not build the DOCX from that run.
-- **Never hide failures:** keep the runner's `.o_error_dialog` check and HttpCase's final console check; no selector fallbacks (`|| el(...)`, `if(btn)`, `try { } catch {}` that continue silently). A missed target must fail the test. `expect_error: True` only for a frame that deliberately documents a business message.
-- **`0 failed` is not enough:** after every run, check the log with a bounded summary, then look at the images:
-  `grep -E " ERROR |Traceback|Uncaught" odoo.log | grep -v "Importing test framework" | cut -c1-200 | sort | uniq -c | sort -rn | head -20`
-  (the only known harmless line is “Importing test framework”). Read full tracebacks only for the lines this shows.
+- **Stop the capture only for errors visible in the UI:** an Odoo error/warning dialog (“Rất tiếc!”, “Oops”, UserError, access error), a selector that misses, or a step that reaches the wrong screen. Do not continue to the next frame, do not use earlier images and do not build the DOCX from that run.
+- **Log and console errors do not stop the work** (user decision, for now): do not grep `odoo.log` after each run and do not fail a run on browser console errors. Open the log only to diagnose a failed frame.
+- **Never hide UI failures:** keep the runner's `.o_error_dialog` check; no selector fallbacks (`|| el(...)`, `if(btn)`, `try { } catch {}` that continue silently). A missed target must fail the test. `expect_error: True` only for a frame that deliberately documents a business message. Look at the images before using them.
 - **Report to the user** (in Vietnamese): which step, the exact message or log line, the likely cause with evidence, and whether it is a temp-environment problem (missing filestore, module not installed, stale assets) or a real system/customization bug. Fix environment problems and recapture; for a possible system bug, stop and ask before going on, and never document the faulty behaviour as correct.
 - The same applies to build scripts: a failed assert, `check_docx` issue or unresolved reference stops the handover until fixed or reported.
 
@@ -58,6 +56,6 @@ An error seen while capturing or building is a finding for the user, never somet
 
 ## Before handing over
 
-Compare with scope and source: no lost manual edits, no restored deletions, nothing beyond the assigned part. Review images per step and per “Kết quả”: open each one, drop unnecessary marks, check arrows cover no text and borders are thin. Render to PDF with an available tool to check layout, TOC page numbers and that links land on the right page; automated checks do not replace looking at the render. Record skipped checks in internal notes and state limits that affect the handover.
+Compare with scope and source: no lost manual edits, no restored deletions, nothing beyond the assigned part. Review images per step and per “Kết quả”: open each one, drop unnecessary marks, check arrows cover no text and borders are thin. Render to PDF **in a temp dir (e.g. `/tmp`), never next to the DOCX**, to check layout, TOC page numbers and that links land on the right page, then delete it; deliver a PDF only when the user asks for one; automated checks do not replace looking at the render. Record skipped checks in internal notes and state limits that affect the handover.
 
 Reply in Vietnamese with the **DOCX** link, a short change summary and what is not yet written. Do not send Markdown instead of Word. Do not publish, commit or push the document or the skill unless asked.

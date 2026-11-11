@@ -161,7 +161,7 @@ Version-specific API: the runner uses `ChromeBrowser._wait_code_ok` and `_websoc
 5. Hides the overlay and calls **`Page.captureScreenshot`** (`format='png'`, the crop) → clean PNG.
 6. Unless `clean`, shows the overlay and captures the same crop → annotated PNG; a fresh browser capture, not an edited image.
 7. Writes metadata, coordinates, URL and SHA256 of both images; clears the overlay.
-8. Finishes the flow (`finish_js`), checks for unsaved forms and browser errors, then writes `manifest-<flow>.json`. On a failing frame it saves a full-viewport image in `debug/` and fails the test.
+8. Finishes the flow (`finish_js`), checks for unsaved forms, then writes `manifest-<flow>.json`. On a failing frame it saves a full-viewport image in `debug/` and fails the test.
 
 ```python
 encoded = browser._websocket_request('Page.captureScreenshot', params={
@@ -242,7 +242,7 @@ PY
 | --- | --- |
 | DB selector page instead of Odoo | `db_name` and `dbfilter` must name the same temp DB; check port and URL. |
 | Test ends without images | Chrome, websocket-client on `PYTHONPATH`, test tags, frame count, manifest; a skipped test is not a capture. |
-| Error dialog “Rất tiếc / Oops” or test fails at a step | Read the dialog text and `odoo.log`; fix the cause (e.g. missing filestore after recreating `data_dir` → `DELETE FROM ir_attachment WHERE url LIKE '/web/assets/%'`), recapture, and tell the user. Never keep a custom runner that skips HttpCase's final error check. |
+| Error dialog “Rất tiếc / Oops” or test fails at a step | Read the dialog text (open `odoo.log` only to diagnose); fix the cause (e.g. missing filestore after recreating `data_dir` → `DELETE FROM ir_attachment WHERE url LIKE '/web/assets/%'`), recapture, and tell the user. |
 | Selector fallback (`\|\| el('.dropdown-menu')`, `if(btn)`) | Do not use: a missed target must fail, not box the wrong element. Match labels robustly (Odoo 20 writes “Xoá”, not “Xóa”). |
 | Button not found / selector timeout | Modules, role, language, version, record state, real DOM; fix the selector, never invent a button. |
 | Right label, wrong element | Use a specific selector (e.g. `button.o_user_menu`, the table not the view switcher). |

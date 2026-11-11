@@ -93,7 +93,6 @@ class TestGuideCapture(HttpCase):
         for directory in ('raw', 'annotated', 'metadata', 'debug'):
             (output / directory).mkdir(parents=True, exist_ok=True)
         annotations = Path(__file__).with_name('annotations.js').read_text()
-        original = ChromeBrowser._wait_code_ok
         rows = []
         identifiers = [frame['id'] for frame in frames]
         self.assertEqual(len(identifiers), len(set(identifiers)), 'Duplicate step ids in this flow')
@@ -199,8 +198,7 @@ class TestGuideCapture(HttpCase):
                     png(browser, {'x': 0, 'y': 0, 'width': 1440, 'height': 900, 'scale': 1}, output/'debug'/f'{step}-failure.png')
                     raise
             evaluate(browser, finish_js + "\nif(document.querySelector('.o_form_dirty,.o_form_status_indicator_new_record'))throw Error('Finish the flow by saving or discarding through the real UI');")
-            # HttpCase still performs its console/error checks; never log success after a failed frame.
-            return original(browser, "console.log('test successful');", 60)
+            # Browser console errors are not checked (user decision); UI errors fail via assert_no_odoo_error.
 
         with patch.object(ChromeBrowser, '_wait_code_ok', run):
             self.browser_js(url, "console.log('test successful');", login=login, timeout=180)
