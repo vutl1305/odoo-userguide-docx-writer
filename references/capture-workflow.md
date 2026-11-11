@@ -172,7 +172,7 @@ path.write_bytes(base64.b64decode(encoded))
 
 Arrow: 2px shaft, 10 × 8px head, `markerUnits="userSpaceOnUse"`. Point at the exact button/field, never at empty space. Never cut labels or the arrow. Keep the crop to the relevant dialog/field group; mostly-empty images shrink the text in Word.
 
-## 6. Check the output and put images into Word
+## 6. Check the output and put images into the section Markdown
 
 ```text
 shots/

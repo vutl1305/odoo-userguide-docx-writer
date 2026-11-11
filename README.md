@@ -8,7 +8,7 @@ The agent reads `SKILL.md`; this README is for people.
 
 - Plans the outline, then writes task guides from an SRS: numbered steps, an image after every step and every “Kết quả” (result), field tables at the create/edit step.
 - Captures real screenshots through Odoo `HttpCase` + headless Chrome: clean and annotated PNGs (small arrow or thin frame), real login/logout across page loads, manifest per flow.
-- Formats Word: Times New Roman, 1px image borders, clickable “mục X.Y” cross-references, structural checks.
+- Writes each section as Markdown with the screenshots for review; the companion skill `odoo-userguide-docx-export` turns it into the customer's Word file locally (Times New Roman, 1px image borders, clickable “mục X.Y” references, TOC page numbers, structural checks).
 - Revises customer-edited DOCX files without losing manual edits.
 
 ## Install
@@ -38,9 +38,6 @@ Then ask the agent, e.g. “Dùng skill odoo-userguide-docx-writer viết mục 
 | `references/capture-workflow.md` | Step-by-step capture runbook. |
 | `assets/odoo_userguide_capture/` | Template add-on (`HttpCase`) that captures the images. |
 | `scripts/screenshot_annotations.js` | Draws the small arrow/frame and computes the crop. |
-| `scripts/style_docx_images.py` | Adds 1px borders to DOCX images. |
-| `scripts/link_section_refs.py` | Makes “mục X.Y” references clickable. |
-| `scripts/check_docx.py` | Checks fonts, borders, per-step images. |
 | `tests/` | Unit tests and the browser test page for the annotation helper. |
 
 ## Tests

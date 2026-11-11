@@ -51,12 +51,4 @@ The OS file picker may not appear in browser screenshots: when showing an upload
 
 ## Repeatable checks
 
-```bash
-python3 scripts/link_section_refs.py source.docx linked.docx
-python3 scripts/style_docx_images.py linked.docx revised.docx
-python3 scripts/check_docx.py revised.docx --require-step-images
-```
-
-The scripts use `lxml`; the tests also use `python-docx`. Reuse an environment that already has them; do not install into the Odoo environment casually. After changing a tool, run `python3 -m unittest discover -s tests`.
-
-These are structural checks; they do not prove the Odoo procedure or that an arrow hits the right button. An outline without steps does not need `--require-step-images`. The checker reports non-default fonts and missing borders; fix according to the current request, never use it to override a newer user choice. Re-run after Word/LibreOffice saves the file, since they may normalise the XML.
+The DOCX tools (export, reference links, borders, checker and their tests) live in the skill `odoo-userguide-docx-export`. Export Markdown sections with its `scripts/export_docx.py`; it runs the link, border, TOC and structure steps. These are structural checks; they do not prove the Odoo procedure or that an arrow hits the right button. Re-run after Word/LibreOffice saves the file, since they may normalise the XML.

@@ -22,6 +22,8 @@ Frame keys (one frame = one documented step or one "Kết quả" image):
   navigate    JS that triggers a full page load (login submit, logout, reload)
   ready       selector that proves the new page is usable (required with navigate)
   expect_error  allow a visible Odoo error dialog (only when the guide documents that message)
+Helpers for frames (fld, fill, pick, tab, saveForm, actionMenu, addLine, openActivities, wideName, search)
+and per-version selectors (UG.*) come from versions/odooNN.js + versions/common.js; see references/odoo-versions.md.
 Never add silent fallbacks (`|| el(...)`, `if (btn)`): a missed target must fail the test.
 Add new frame keys here, in the skill template, not in a per-project copy of capture_steps.
 """
@@ -59,6 +61,20 @@ const byText = async (selector, ...labels) => until(() => [...document.querySele
 const paint = async () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 '''
 
+# Version profile: selectors that differ per Odoo version (versions/odooNN.js) + shared helpers (common.js).
+from odoo.release import version_info as _version_info
+_PROFILE = Path(__file__).with_name('versions') / f'odoo{_version_info[0]}.js'
+PROFILE_ERROR = None if _PROFILE.exists() else (
+    f'No capture profile for Odoo {_version_info[0]}: copy the nearest versions/odooNN.js to {_PROFILE.name}, '
+    'check each selector against this version\'s web/mail templates, run test_contact_form, then keep it in the skill.')
+if not PROFILE_ERROR:
+    HELPERS += _PROFILE.read_text() + _PROFILE.with_name('common.js').read_text()
+
+
+def user_groups_field(env):
+    """res.users groups field: group_ids (Odoo 19+) or groups_id (older)."""
+    return 'group_ids' if 'group_ids' in env['res.users']._fields else 'groups_id'
+
 @tagged('post_install', '-at_install', 'userguide_capture')
 class TestGuideCapture(HttpCase):
     browser_size = '1440x900'
@@ -86,6 +102,7 @@ class TestGuideCapture(HttpCase):
 
     def capture_steps(self, flow, url, frames, finish_js='', login=True):
         """login=True: seeded admin; None: start logged out (login page); or a login name."""
+        self.assertFalse(PROFILE_ERROR, PROFILE_ERROR)
         login = self.login if login is True else login
         self.assertTrue(re.fullmatch(r'[A-Za-z0-9_-]{1,80}', flow), 'Use a safe flow name')
         base_output = Path(os.environ['UG_CAPTURE_OUTPUT']).resolve()
@@ -226,10 +243,10 @@ class TestGuideCapture(HttpCase):
              'ready': '.o_web_client .o_main_navbar', 'target': '.o_main_navbar'},
             {'id': 'logout-01-avatar', 'section': 'Đăng xuất', 'phase': 'before', 'box_only': True, 'no_union': True,
              'clip': ['.o_main_navbar .o_menu_systray'], 'pad': 30,
-             'instruction': 'Chọn ảnh đại diện.', 'target': 'button.o_user_menu'},
+             'instruction': 'Chọn ảnh đại diện.', 'target_js': 'el(UG.userMenu)'},
             {'id': 'logout-02-menu', 'section': 'Đăng xuất', 'phase': 'before', 'no_union': True,
              'clip': ['.o_main_navbar .o_menu_systray', '.o-dropdown--menu'], 'pad': 75,
-             'instruction': 'Chọn Đăng xuất.', 'prepare': "await click('button.o_user_menu');",
+             'instruction': 'Chọn Đăng xuất.', 'prepare': "(await el(UG.userMenu)).click();",
              'target': '[data-menu=logout]'},
             {**login_crop, 'id': 'logout-result', 'section': 'Đăng xuất', 'phase': 'after', 'clean': True,
              'instruction': 'Kết quả: màn hình đăng nhập.', 'navigate': "document.querySelector('[data-menu=logout]').click();",
@@ -241,10 +258,10 @@ class TestGuideCapture(HttpCase):
         self.capture_steps('preferences', '/odoo', [
             {'id': 'pref-01-avatar', 'section': 'Tùy chọn cá nhân', 'phase': 'before', 'box_only': True, 'no_union': True,
              'clip': ['.o_main_navbar .o_menu_systray'], 'pad': 30,
-             'instruction': 'Mở menu cá nhân.', 'target': 'button.o_user_menu'},
+             'instruction': 'Mở menu cá nhân.', 'target_js': 'el(UG.userMenu)'},
             {'id': 'pref-02-menu', 'section': 'Tùy chọn cá nhân', 'phase': 'before', 'no_union': True,
              'clip': ['.o_main_navbar .o_menu_systray', '.o-dropdown--menu'], 'pad': 75,
-             'instruction': 'Chọn Tùy chọn của tôi.', 'prepare': "await click('button.o_user_menu');",
+             'instruction': 'Chọn Tùy chọn của tôi.', 'prepare': "(await el(UG.userMenu)).click();",
              'target': '[data-menu=preferences]'},
             {'id': 'pref-result', 'section': 'Tùy chọn cá nhân', 'phase': 'after', 'clean': True,
              'clip': ['.modal-content'], 'pad': 16,
@@ -252,3 +269,24 @@ class TestGuideCapture(HttpCase):
              'prepare': "await click('[data-menu=preferences]');await el('.modal .o_form_view');",
              'target': '.modal .o_field_widget[name=lang]'},
         ], finish_js="await click('.modal-header .btn-close');await until(()=>!document.querySelector('.modal'),'preferences closed');")
+
+    def test_contact_form(self):
+        """Exercises the version profile: list column, form fill/pick/save, action menu (base only)."""
+        sec = 'Liên hệ'
+        self.capture_steps('contact_form', '/odoo/action-base.action_partner_form', [
+            {'id': 'contact-01-list', 'section': sec, 'phase': 'before', 'clean': True,
+             'instruction': 'Danh sách liên hệ.', 'clip': ['.o_list_renderer'], 'max_h': 260, 'max_w': 820,
+             'prepare': "(await el('.o_switch_view.o_list')).click(); await el('.o_list_renderer .o_data_row'); await wideName();",
+             'target': '.o_list_renderer'},
+            {'id': 'contact-02-form', 'section': sec, 'phase': 'before',
+             'instruction': 'Nhập Tên và Quốc gia.',
+             'prepare': "(await el('.o_control_panel_main_buttons .o_list_button_add')).click(); await el(M + '.o_form_sheet');"
+                        "await fill(fld('name') + ' input, ' + fld('name') + ' textarea', 'Công ty TNHH Thương mại Hòa Bình');"
+                        "await pick(fld('country_id') + ' input', 'Việt Nam');",
+             'target': '.o_action_manager .o_field_widget[name="country_id"]',
+             'clip': ['.o_action_manager .o_inner_group:has(.o_field_widget[name="country_id"])'], 'pad': 16},
+            {'id': 'contact-03-actions', 'section': sec, 'phase': 'before', 'instruction': 'Lưu rồi mở menu hành động.',
+             'prepare': "await saveForm(); await actionMenu();",
+             'target_js': "byText('.o-dropdown--menu .dropdown-item', 'Lưu trữ', 'Archive')",
+             'clip': ['.o-dropdown--menu', '.o_cp_action_menus'], 'pad': 16},
+        ], finish_js="document.body.click(); await pause(300);")
