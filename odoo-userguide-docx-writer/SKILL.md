@@ -47,6 +47,7 @@ To capture, follow the [runnable capture workflow](references/capture-workflow.m
 - Split by section; each agent owns only its section Markdown, its parts dir (`capture_parts.py`, `shots/`) and its own capture DB, work dir, port and log. No agent edits the DOCX, the skill or another section's files; skill changes go into the agent's report.
 - Each agent's DB is a copy of the shared capture DB **with its filestore** (`pg_dump | pg_restore` works while a server is connected; `createdb -T` does not). Drop the copies and their filestores when done.
 - The coordinator reviews all Markdown, then exports once with every section file in one command.
+- **Strong vs cheap model:** when the user assigns models per step, follow [model split](references/model-split.md): the strong model writes the section brief, the prose and the final review; the cheap model only captures from the brief and exports, and reports deviations instead of deciding them.
 
 ## Stop and report on errors
 
