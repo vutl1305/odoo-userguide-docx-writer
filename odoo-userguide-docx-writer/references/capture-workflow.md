@@ -202,9 +202,41 @@ for manifest in sorted(out.glob('manifest-*.json')):
 PY
 ```
 
-Then **look at every image** (full size or a sharp contact sheet) against its text: right screen, data, state, labels, arrow target; no spinner, error, banner or covered text. When changing the annotation helper, open `tests/annotations.html` in headless Chrome and expect `PASS`, plus the skill's Python tests. Keep the DB until images are final.
+Then **open every image at full size** against its text (a contact sheet is only an index): right screen, data, state, labels, arrow target; no spinner, error, banner or covered text.
 
-Copy images, manifest **and the adapted add-on** into a persistent project folder (e.g. `docs_local/user_guide_assets/<version>_<section>/`), so a later run can reuse the selectors instead of rediscovering them; `/tmp` does not survive reboots. In the DOCX pick images by **step/result ID**: `raw` when clear or for results, `annotated` only for hard-to-find targets. Insert right after the step or “Kết quả” paragraph with caption and alt text, keeping the scale rule from the Word reference. Never pick “the newest PNG” or rely on image order in the DOCX ZIP. Then run `link_section_refs.py`, `style_docx_images.py` and `check_docx.py` as in the Word reference.
+**Image checklist — every image, at real size, before writing or exporting** (lesson from v0.26,
+where 4.6/4.7 passed every test yet ~half the images were unusable because only a 700px contact
+sheet and "test passed" were checked). "Test passed" only means the clicks ran; it says nothing
+about the picture. Open each PNG at full size and reject it when any line fails:
+1. **Nothing covers the content.** No open search/filter/measure dropdown, menu or tooltip over
+   the table, chart or form — except a step image whose subject *is* that menu.
+2. **Every action step has an arrow/frame on the exact object it names**, including view switches on report screens. Clean is reserved for results/overviews without an action to locate. **The arrow/frame points at the exact object the step names** (one button, field, column,
+   filter item). An arrow in a corner or on a settings icon means the target was a whole
+   container: fix the target.
+3. **Tight crop, readable text.** The subject fills the image; no large empty area; text still
+   readable at Word width (~16 cm).
+4. **Meaningful data.** Reports show several rows/bars that illustrate the point (not one bar,
+   not an empty-state or blurred "sample" view); lists show the records the text mentions.
+5. **Matches the caption and the step text** (same grouping, filter, record, status and labels).
+   If the text says "nhóm theo Nhóm khách hàng", the image is grouped that way.
+6. No odd leftover state: stray search facets, default filters in English, half-loaded views.
+Record rejected images with the reason and fix the frame; do not write prose around a bad image.
+
+Frame rules that prevent these failures:
+- A `phase='after'` / report frame must end in the finished state: after choosing filters or
+  groups, **close the dropdown** (click the toggler again or press Escape) and wait for the data,
+  then capture.
+- `target` is a specific element (a button, a `th`/cell, a filter item, a field widget), never
+  `.o_content`, `.o_list_renderer` or `.o_pivot table` with an arrow; for a clean overview use
+  `clean: True` and no arrow.
+- `clip` the table/chart/form block, not the whole content area; for short lists add `max_h`. Keep every relevant column/header in view; if a Pivot table overflows, use its real Flip axis control or another real UI layout and update the instructions. Crop small dropdowns with their source control, excluding unrelated charts; never enlarge a small menu to full Word width.
+- Close menus through real UI events and wait until they are no longer visible. Never remove/hide a dropdown with DOM/CSS changes to manufacture a clean screenshot; fail and fix the interaction instead.
+- Seed enough report data (several users, types, months, states) before capturing reports.
+- Take Vietnamese labels for filters, groups and measures from the **database** (the module's
+  translation may override Odoo's `vi.po`): read the view `arch_db->>'vi_VN'` or
+  `ir_model_fields.field_description->>'vi_VN'`. When changing the annotation helper, open `tests/annotations.html` in headless Chrome and expect `PASS`, plus the skill's Python tests. Keep the DB until images are final.
+
+Copy images, manifest **and the adapted add-on** into a persistent project folder (e.g. `docs_local/user_guide_assets/<version>_<section>/`), so a later run can reuse the selectors instead of rediscovering them; `/tmp` does not survive reboots. In the DOCX pick images by **step/result ID**: `annotated` for action steps (including Pivot/list switches and inputs), `raw` for clean results/overviews without an action to locate. Insert right after the step or “Kết quả” paragraph with caption and alt text, keeping the scale rule from the Word reference. Never pick “the newest PNG” or rely on image order in the DOCX ZIP. Then run `link_section_refs.py`, `style_docx_images.py` and `check_docx.py` as in the Word reference.
 
 ## 7. Clean up
 

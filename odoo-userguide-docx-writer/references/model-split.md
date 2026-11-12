@@ -1,45 +1,80 @@
-# Splitting work between a strong and a cheap model
+# Lead and capture worker responsibilities
 
-Use when the user assigns different models to different steps. Most tokens go into the
-capture loop (run, failing selector, read debug image, fix, rerun); quality depends on
-analysis and prose. So split by **kind of work**, not by how hard a section looks.
+Use when capture work is delegated. Reduce repeated reading, reruns and reporting;
+never reduce the capture specification or visual review to save tokens.
 
-| Step | Work | Model | Output |
-|---|---|---|---|
-| 1. Analyse | Read SRS + code, decide real behaviour, UI labels EN/VI, SRS gaps, plan shots and data; **write the `capture_parts.py` skeleton** | **strong** | `briefs/<section>.md` (section brief) + `<parts dir>/capture_parts.py` |
-| 2. Capture | Run the skeleton, read debug images, fix selectors/waits/crops until pass | cheap | `shots/`, manifest, `briefs/<section>.capture.md` (capture report) |
-| 3. Write | Section Markdown from the brief + images | **strong** | `guide/<section>.md` |
-| 4. Export | `export_docx.py`, read its checks | cheap | DOCX + check output |
-| 5. Review | Contact sheet vs text, SRS gaps for the user | **strong** | reply to the user |
+| Work | Owner | Output |
+|---|---|---|
+| Analyse code/SRS, write prose, plan frames and seed data | Lead | Brief, runnable `capture_parts.py`, section Markdown |
+| Execute capture and fix the assigned frames | Worker | PNGs, manifest, brief result message |
+| Review every selected image, export, check layout and replace working DOCX | Lead | One stable customer DOCX |
 
-Paths are relative to the guide assets dir (e.g. `docs_local/user_guide_assets/`).
-Steps 1, 3, 5 may be one strong-model session; steps 2 and 4 are separate cheap-model runs.
-If the brief is vague the cheap model guesses and the saving is lost: spend effort on step 1.
+Follow the user's current worker type and permission mode. Use the existing clone DB pool
+with its own ports/filestores; reuse idle clones, one active capture per DB. Do not create
+a DB for each new worker. Keep the clones for later sections unless removal is requested.
 
-### Hand the cheap model a runnable skeleton, not a reading list
-Lesson from v0.19–v0.20 (3.1/3.4 and 3.5–3.10): a cold worker that must read SKILL.md,
-capture-workflow, capture_env, briefs and a 400-line sample, then write the script itself,
-needed 30–60 min before the first image and wandered into source digging (OWL code, tours —
-the capture harness uses neither). Most fixes after that were one run each.
-- In step 1 the strong model writes `<parts dir>/capture_parts.py` itself: seed data, menu
-  path (`data-menu-xmlid`), every frame id from the brief with selector, clip and wait.
-  Copy from the last passing parts file; selectors were already looked up for the brief.
-- Handoff = brief + skeleton + the run command + the rules below. No other reading list.
-  Tell the worker explicitly: do not read Odoo/web source; fix only from debug images.
-- Start the worker in **Default** (approval) mode so drift is visible from the permission
-  stream; in YOLO mode check its files/progress yourself before trusting the report.
-- Very small sections (≤ ~8 shots) may be cheaper for the strong model to capture directly.
+## Prepare once, run in batches
 
-## Rules for the cheap model (steps 2 and 4)
+1. The lead supplies a runnable skeleton: source/seed data, real UI paths and translated
+   labels, each frame ID, exact action/result, target, crop and wait condition. Read labels
+   from the reused DB, not guesses or only `vi.po`; installed translations can override them.
+2. If the user permits a lead dry-run, run all tests once in one command before handoff.
+   Passing tests still require visual review. If the user delegates all capture to workers,
+   let the worker do this batch; do not take over without authorization.
+3. For a few failures (about 3 or fewer), the lead can diagnose/debug and supply exact fixes;
+   execute them only within the user's division of work. For many failures, assign only the
+   failing tests with error/debug paths; mark passing tests “do not rerun”.
+4. The worker runs the entire assigned batch in one command first, then reruns only failed
+   tests. At most **2 repair attempts per frame** after the initial batch; still failing means
+   stop that frame and report the error/debug path, not invent success or loop indefinitely.
 
-1. **The brief is the spec.** Do not decide business behaviour, do not edit the brief,
-   do not write guide prose. If Odoo behaves differently from the brief (other button,
-   other status, unexpected dialog), stop that shot and record it under “Bất thường”.
-2. **Retry limit:** at most 3 capture attempts per shot. Still failing → mark it
-   `bỏ` with the last error and debug image path, move on to the next shot.
-3. **Report in the fixed format below.** The strong model reads only the report and the
-   contact sheet, not logs.
-4. All rules in SKILL.md still apply (own DB/port, no selector fallbacks, stop on UI errors).
+## Self-contained handoff
+
+Keep dispatch concise but complete; no arbitrary line/token budget. Include:
+- run command, exact test/frame IDs, passing tests not to rerun;
+- DB/port, owned output directory and file boundaries;
+- per-frame action, arrow target, crop, state to wait for, and known fixes;
+- no changes to application code, no production writes or external sends;
+- the retry limit and a short completion report (accepted/pending IDs, errors, abnormalities).
+
+Do not require a cold worker to read a stack of skill/brief/sample files before running.
+Necessary frame instructions stay in the skeleton/dispatch. Only the lead writes the guide
+or changes the DOCX. Contact sheets and long worker reports are optional, never a prerequisite.
+
+## Keep follow-ups out of the queue
+
+- Worker replies/notifications may be written before queued messages are read. Match each
+  report to the latest assigned frames and file timestamps; an old “done” is not acceptance
+  of a new correction. Handle a stable inbox ID once.
+- Do not stack status requests and repeated reminders behind a busy turn. Read available
+  status/artifacts when the user asks; send one consolidated correction after review.
+- A report task ends after reporting; the worker must not wait on a background job it has
+  already observed finished. The lead can review available images before a long report arrives.
+- If work appears stalled, inspect current task, output changes and relevant failed test.
+  Stop/reassign or take over only under user authorization; preserve finished frames and
+  avoid concurrent writers. Do not claim the worker received a queued message until confirmed.
+- Give estimates as estimates based on observed progress, not promises. “Working” alone
+  does not establish progress; report which images exist and which the lead has accepted.
+
+## Acceptance, not just test success
+
+Follow [capture workflow §6](capture-workflow.md): open every selected PNG at full size and
+compare with the exact step/caption; inspect rendered Word-width pages too. Contact sheets
+are optional navigation aids, never a substitute. A worker's “all images pass” is unverified
+until lead review. Reject clipped columns, unreadable names, hidden inputs, misplaced arrows,
+menus covering result data, irrelevant background, or insufficient report data.
+
+Action steps must mark the exact named control/input even on report tables (e.g. Pivot
+switch, Flip axis, Counted input); result images stay clean. Close dropdowns through the real
+UI and wait for the intended state; never delete/hide DOM elements to fake completion.
+Rejected images get a concrete reason/target fix; do not write around them or silently omit
+an essential action. Report any unresolved gap before handover.
+
+## Worker completion message
+
+Return only completed/pending frame IDs and paths, the exact last error/debug path for a
+pending frame, and unexpected labels/data. No repeated completion report for queued status
+requests. The lead owns final acceptance and export.
 
 ## Section brief template (written by the strong model)
 
@@ -68,44 +103,3 @@ Tài khoản chụp: <login> (chỉ để chụp; văn bản không nêu vai tr�
 - Kết quả: ...
 - Lưu ý: ...
 ```
-
-## Capture report template (written by the cheap model)
-
-```markdown
-# Báo cáo chụp <số>
-
-| id | Trạng thái | File | Ghi chú |
-|---|---|---|---|
-| s41-01-menu | ok | shots/sec_4_1/annotated/s41-01-menu.png | |
-| s41-05-save | bỏ | shots/sec_4_1/debug/s41-05-save-failure.png | selector .o_x không thấy sau 3 lần |
-
-## Bất thường (khác phiếu)
-- <id>: phiếu ghi ..., hệ thống hiện ... (ảnh: <path>)
-
-Contact sheet: shots/<flow>/contact.png
-```
-
-## Contact sheet (end of step 2, read in step 5)
-
-One image per flow so the reviewer opens one file instead of every PNG:
-
-```bash
-python3 - shots/<flow> <<'E'
-import sys, glob
-from PIL import Image, ImageDraw
-d = sys.argv[1]; W = 600
-files = sorted(glob.glob(f'{d}/annotated/*.png') + glob.glob(f'{d}/raw/*result*.png'))
-ims = [Image.open(f).convert('RGB') for f in files]
-ims = [i.resize((W, int(i.height * W / i.width))) for i in ims]
-cols = 3; rows = [ims[k:k + cols] for k in range(0, len(ims), cols)]
-H = sum(max(i.height for i in r) + 24 for r in rows)
-sheet = Image.new('RGB', (W * cols, H), 'white'); y = 0; dr = ImageDraw.Draw(sheet)
-for r, names in zip(rows, [files[k:k + cols] for k in range(0, len(files), cols)]):
-    for c, (im, n) in enumerate(zip(r, names)):
-        dr.text((c * W + 4, y + 4), n.rsplit('/', 1)[1], fill='black'); sheet.paste(im, (c * W, y + 24))
-    y += max(i.height for i in r) + 24
-sheet.save(f'{d}/contact.png')
-E
-```
-
-The sheet checks marks and crops; wide form/list crops become too small to read text. Open a single image when its text must be checked or the mark or crop looks doubtful.

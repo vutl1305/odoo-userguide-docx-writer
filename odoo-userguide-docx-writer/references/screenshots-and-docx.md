@@ -19,9 +19,9 @@ Keep a manifest with at least: step or result ID, section, instruction/result te
 
 | Purpose | Presentation |
 | --- | --- |
-| Small button, icon, field or hard-to-find menu item | Small arrow or thin frame on the exact target. |
+| Action step: click/select/switch/type | Small arrow or thin frame on the exact button, menu item or input named in the step. |
 | Target sits right next to text (e.g. avatar beside the company name) | Thin frame only (`box_only`), so no arrow crosses the text. |
-| App overview, list, saved form, report table/chart | Clean by default; mark only a specific detail to point out. |
+| Overview, saved form, report table/chart with no action to locate | Clean. If the accompanying step asks for an action, the action rule above takes precedence. |
 | “Kết quả” | Captured after the action, clean, showing state/data/output; placed right after the result paragraph. |
 
 Examples: create record → saved form with its name; note → the note in the history; schedule activity → the activity added; export Excel → the content of the really exported file; login → home screen; logout → login screen. A before-click image pointing at Lưu/Gửi/Xuất never replaces the result image.
@@ -47,7 +47,7 @@ The OS file picker may not appear in browser screenshots: when showing an upload
 - Insert images directly so the DOCX is self-contained. Keep aspect ratio and **one scale for all screenshots** (e.g. 750px → full text width, about 0.022 cm/px), capped at text width; never blow a small crop up to full width. Set keep-with-next on step → image and on the “Kết quả” paragraph → its image so they do not split across pages. Add alt text.
 - Outer border **1px = 0.75pt = 9525 EMU** at 96dpi, thin grey. `style_docx_images.py` sets it on the Word picture, not on the pixels. If a PNG with a raster border is required, add exactly 1 pixel outside the image with an allowed image tool.
 - When editing the DOCX ZIP, keep image relationships and PAGE/NUMPAGES/TOC fields. Do not reassign text to every footer run (it can delete dynamic fields). Do not duplicate `docProps/core.xml` or picture/bookmark IDs when merging.
-- Check the rendered PDF/Word: cut text, captions, step order, blank pages, stranded lines, tiny labels, image borders. Review each image at full size or in a sufficiently sharp contact sheet; look at problem images on their own.
+- Check the rendered PDF/Word: cut text, captions, step order, blank pages, stranded lines, tiny labels, image borders. Open every chosen image at full size against its step/caption, then inspect representative rendered pages at Word width. A contact sheet is an optional index, not acceptance evidence.
 
 ## Repeatable checks
 
