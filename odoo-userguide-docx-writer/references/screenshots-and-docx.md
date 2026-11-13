@@ -13,7 +13,11 @@ With Odoo source available, use the skill's self-contained template in `assets/o
 
 ## Images for steps and for “Kết quả”
 
-Keep a manifest with at least: step or result ID, section, instruction/result text, image, before/after state, and clean vs annotated choice (arrow target only when annotated). Capture the state before the click or after the result, as the caption says. One overview image for several steps does not satisfy “one image per step”.
+Keep a manifest with at least: step or result ID, section, instruction/result text, image, before/after state, and clean vs annotated choice (arrow target only when annotated). Capture the state before the click or after the result, as the caption says. One overview image for several steps does not satisfy “one image per step”. A step that bundles several user actions (open a menu, pick a record in a list,
+check fields, fill a dialog, press the button) gets one image per action, or is split into
+sub-steps: navigation (menu open with the item marked), the list with the record marked, the
+fields to check or fill framed, then the confirm button. A single image of the final button
+leaves the reader without the path; plan these frames in the capture brief, not after review.
 
 ### Clean or annotated
 

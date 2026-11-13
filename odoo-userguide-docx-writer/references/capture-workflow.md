@@ -284,4 +284,5 @@ PY
 | “Finish the flow by saving or discarding” | Save or discard through the UI in `finish_js`; claim a save only when verified. |
 | Arrow tail or labels cut, tiny text | Adjust `clip`/`pad`; check the raw image; never stretch a small crop to hide a bad crop. |
 | Arrow crosses neighbouring text | Use `box_only`, or a target/crop where the arrow has free space. |
+| Whole form sheet as target: frame hugs the image edge, arrow points into empty space, a half-cut button shows above | Use `box_only` + `no_union`, and add the status bar (or the element above) to `clip` so nothing is cut. Better: target only the field group the step is about. |
 | Want smaller arrows on old images | Recapture from clean images; never paint over the old arrow. |

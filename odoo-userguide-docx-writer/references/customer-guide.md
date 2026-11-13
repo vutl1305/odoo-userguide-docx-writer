@@ -9,6 +9,11 @@ The guide is Vietnamese. Quoted Vietnamese text below is the exact wording or he
 - The SRS sets scope; the UI/code confirms how it actually works. When they conflict, record the gap; never silently invent a button or pick one rule and present it as agreed.
 - Verify the actual version, language and modules. A customized Odoo is not the standard app of the same name.
 
+**Settle conventions before the first capture.** Changing them later means recapturing every affected image:
+- Local accounting: Vietnamese chart of accounts and VAT (e.g. 1561/632/5111/1311/3311/1331/33311, GTGT 10%) when the readers are Vietnamese accountants; a test DB on Odoo's generic chart (110100, 600000, 15% tax) looks wrong to them. Recode accounts and add the local tax (with its own tax group label) on the capture DB if the customer's DB is not set up yet.
+- Configuration branches the reader must tell apart (e.g. inventory valuation Automatic vs Periodic, costing methods): decide which branches get worked examples, then give each chapter the same parallel structure with the branch named in the heading (“X.2. Khi dùng định giá Tự động”, “X.3. Khi dùng định giá Định kỳ”). A chapter that only mentions the other branch in passing confuses readers.
+- Whether the customer's name may appear in the text (cover only, or nowhere).
+
 ## Default outline when none is approved
 
 Starting point; adapt to the business in the sources:
