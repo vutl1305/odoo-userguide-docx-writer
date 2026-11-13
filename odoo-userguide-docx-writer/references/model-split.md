@@ -5,13 +5,59 @@ never reduce the capture specification or visual review to save tokens.
 
 | Work | Owner | Output |
 |---|---|---|
-| Analyse code/SRS, write prose, plan frames and seed data | Lead | Brief, runnable `capture_parts.py`, section Markdown |
+| Scoped source lookup (SRS passages, code flow, current DOCX content) when the reading is large | Research worker (optional) | `briefs/<section>.research.md` evidence table |
+| Verify decisive behaviour, write prose, plan frames and seed data | Lead | Brief, runnable `capture_parts.py`, section Markdown |
 | Execute capture and fix the assigned frames | Worker | PNGs, manifest, brief result message |
 | Review every selected image, export, check layout and replace working DOCX | Lead | One stable customer DOCX |
+
+Model size follows the kind of work:
+
+| Work | Model tier | Why |
+|---|---|---|
+| Source research (reading code, SRS, tracing flows) | **Medium** (e.g. gpt-6.1-terra, Sonnet) | Needs real comprehension; a small model misreads flows or stops early. Still far cheaper than the lead. |
+| Capture execution (run tests, fix selectors from debug shots) | **Small** | Manual work on a fully specified skeleton. |
+| Decisions, prose, image acceptance, final DOCX | **Lead** (strong) | Owns correctness and quality. |
+
+Whatever the tier, the dispatch carries **full context and detail**: the worker cannot see the
+conversation. State the goal and why, the end user's task, exact sources/paths/commands, what
+is already known or ruled out, the expected output format, bounds and the stop condition. A
+short vague hand-off costs more in retries than a complete one.
 
 Follow the user's current worker type and permission mode. Use the existing clone DB pool
 with its own ports/filestores; reuse idle clones, one active capture per DB. Do not create
 a DB for each new worker. Keep the clones for later sections unless removal is requested.
+
+## Source research worker (optional)
+
+Use it only when the reading is large (about 5+ source files, long SRS passages, or a whole
+existing chapter). For a small section the lead reads directly: the hand-off plus
+verification costs more than the reading saved.
+
+The lead's research brief must be narrow, because a vague brief returns vague evidence:
+- goal: which section, what the end user must be able to do;
+- exact sources: model/view files, named Odoo standard files, SRS headings, DOCX headings;
+- numbered questions (screen path, required fields, button visibility, rights, state before/
+  after, records created, error messages), each answered with `file:line`, SRS heading/table
+  or the query used, and typed as SRS / code / DB; unverified stays "chưa xác minh";
+- bounds: follow only directly called functions; anything outside the list is asked, not
+  searched; no code/DB changes, no Odoo run, no guessing from field names;
+- output file `briefs/<section>.research.md`: Q table, EN→VI labels, SRS–code gaps, open points.
+
+Execution rules learned in practice:
+- Smoke-test tools first in the dispatch ("run `pwd && ls <dir>` then continue"). A worker
+  that reports "no tools" or ends a turn without reading anything gets one explicit retry;
+  then switch its model (keep the worker and brief) instead of re-prompting.
+- Codex sandbox modes may block `localhost` DB connections. The lead runs the few SELECTs for
+  labels/module state itself, or pastes their output into the brief; do not raise the worker
+  to full access just for this.
+- Demand completion in one turn: "work until the file is written; no interim report; every
+  question answered or marked unverified". Partial files still happen: send one gap list,
+  then stop the worker and finish the remaining points directly.
+- The lead re-reads the decisive code (rights, approvals, money, records created/changed,
+  stage changes) before writing; worker answers are leads, not citations to copy blindly.
+- Sections that explain relationships or rules still get a screenshot when the text names
+  on-screen entry points (smart buttons, menus): one framed shot per form, labels taken from
+  that shot.
 
 ## Prepare once, run in batches
 
