@@ -15,13 +15,23 @@ Starting point; adapt to the business in the sources:
 
 1. Giới thiệu tài liệu và tổng quan hệ thống.
 2. Hướng dẫn sử dụng giao diện và thao tác chung trên Odoo.
-3. Hướng dẫn thực hiện nghiệp vụ.
-4. Quy trình và nguyên tắc nghiệp vụ.
-5. Hướng dẫn xử lý tình huống và hỗ trợ sử dụng.
-6. Giải thích thuật ngữ.
-7. Lịch sử cập nhật tài liệu.
+3. Thiết lập hệ thống trước khi sử dụng.
+4. Hướng dẫn thực hiện nghiệp vụ.
+5. Giải thích thuật ngữ.
+6. Lịch sử cập nhật tài liệu.
 
-Do not turn each SRS business group into a top-level chapter; organise them inside chapter 3 by task. Do not add “Bắt đầu từ đâu”, “Bắt đầu nhanh”, “Hiểu cách hệ thống vận hành”, a worked-example chapter, a repeated business reference list or an assumptions chapter.
+Chapter 3 opens with one sentence on its audience (administrators, Sale Admin; end users may skip it). Skip chapter 3 when nothing needs configuring before use.
+
+Do not turn each SRS business group into a top-level chapter; organise them inside chapter 4 by task. Do not add “Bắt đầu từ đâu”, “Bắt đầu nhanh”, “Hiểu cách hệ thống vận hành”, a separate “Quy trình và nguyên tắc nghiệp vụ” rules chapter, a troubleshooting chapter, a worked-example chapter, a repeated business reference list or an assumptions chapter. A separate rules chapter mostly repeats chapter 4 and drifts out of sync when code changes.
+
+Rules the steps do not show (automatic status/stage changes, approver snapshot, what resets an approval, report gaps, data scope by role, things the system does not block yet) go as short **“Lưu ý:”** paragraphs or a 2-column table at the top of the matching chapter 3/4 section; the data scope by role goes with the role table of the account setup section. The overall business flow belongs in chapter 1.
+
+Optional appendices, only when the customer asks, placed before the glossary:
+
+| Appendix | Content |
+|---|---|
+| “Xử lý tình huống thường gặp” | Only errors actually met in testing or support: symptom → cause → fix → result or support contact. No invented cases. |
+| “Bảng tra cứu nhanh” | For managers and internal support: data scope by role, approval flow summary. Tables only, each row linking to the detailed section; never re-explain the steps. |
 
 The introduction states at least: what the guide covers, for whom, business limits, related apps and the overall flow. Optional sub-sections (access conditions, how to look things up, image conventions) only when useful and not removed by the user. Never restore them when revising a trimmed document.
 
@@ -45,8 +55,8 @@ Do not assume “Sửa” or “Lưu” buttons exist: some versions edit inline
 - How to open the screen, using the verified menu path.
 - Numbered steps, one clear action each, each followed by its image. The image may show the action or its result; the caption must state exactly that state.
 - At the create/edit part, a field table: **Tên trường | Ý nghĩa | Cách nhập/chọn | Bắt buộc/điều kiện | Mặc định/tự điền/chỉ đọc và quy tắc**. Confirm only properties with evidence. Explain codes, units, dates and currency where used.
-- Rules affecting save/send/approve, edit locks and status changes go at the relevant step. Rules shared by many tasks are explained in chapter 4 and referenced, not copied as full field tables.
-- **“Kết quả:”** describe the sign of completion, then insert an image right below showing the state after the action. Result images are clean by default; mark only a detail that is hard to spot. Choose a view with enough data/status instead of repeating the before-click image. If the result is not verified, keep a draft placeholder; never use a before-action image to claim success. Link to the matching troubleshooting case. A case is: symptom → known cause → fix → result/support contact provided.
+- Rules affecting save/send/approve, edit locks and status changes go at the relevant step. Rules shared by many tasks are explained once, in the intro of the chapter 4 section they belong to, and referenced from the others, not copied as full field tables.
+- **“Kết quả:”** describe the sign of completion, then insert an image right below showing the state after the action. Result images are clean by default; mark only a detail that is hard to spot. Choose a view with enough data/status instead of repeating the before-click image. If the result is not verified, keep a draft placeholder; never use a before-action image to claim success.
 
 Cross-references to other sections:
 
